@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.google.maps.android.compose.GoogleMap
 import com.riju.drivertracker.ui.theme.DriverTrackerTheme
 
 class MainActivity : ComponentActivity() {
@@ -19,29 +20,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             DriverTrackerTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                GoogleMap()
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    DriverTrackerTheme {
-        Greeting("Android")
     }
 }

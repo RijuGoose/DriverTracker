@@ -1,11 +1,19 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
 
 android {
     namespace = "com.riju.drivertracker"
     compileSdk = 34
+
+    secrets {
+        propertiesFileName = "secrets.properties"
+        defaultPropertiesFileName = "local.defaults.properties"
+        ignoreList.add("keyToIgnore")
+        ignoreList.add("sdk.*")
+    }
 
     defaultConfig {
         applicationId = "com.riju.drivertracker"
@@ -56,6 +64,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.maps.compose)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
