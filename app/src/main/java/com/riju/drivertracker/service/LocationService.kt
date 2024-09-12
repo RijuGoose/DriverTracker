@@ -7,6 +7,8 @@ import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.riju.drivertracker.repository.LocationRepository
+import com.riju.drivertracker.repository.TrackingRepository
+import com.riju.drivertracker.service.model.TrackingPoint
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -25,6 +27,9 @@ class LocationService : Service() {
 
     @Inject
     lateinit var locationRepository: LocationRepository
+
+    @Inject
+    lateinit var trackingRepository: TrackingRepository
 
     override fun onBind(intent: Intent?): IBinder? {
         return null
@@ -54,16 +59,19 @@ class LocationService : Service() {
                 notificationManager.notify(1, notification.build())
             }
             .onEach { location ->
-                val lat = location.latitude.toString()
-                val lon = location.longitude.toString()
-                Log.d("libalog", "location: $lat, $lon")
+                trackingRepository.addTrackingPoint(
+                    TrackingPoint(location.latitude, location.longitude)
+                )
+                Log.d("libalog-speed", "speed: ${location.speed}")
             }
             .launchIn(serviceScope)
 
         startForeground(1, notification.build())
+        trackingRepository.startTracking()
     }
 
     private fun stop() {
+        trackingRepository.stopTracking()
         stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
     }
