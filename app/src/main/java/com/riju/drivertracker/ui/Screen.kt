@@ -1,7 +1,16 @@
 package com.riju.drivertracker.ui
 
-sealed class Screen(val route: String) {
-    data object Login: Screen("login")
-    data object Register: Screen("register")
-    data object Map: Screen("map")
+import kotlinx.serialization.Serializable
+
+object Screen {
+    @Serializable
+    object Login
+    @Serializable
+    object Register
+    @Serializable
+    object Map
+    @Serializable
+    object TripHistory
+    @Serializable
+    data class TripDetails(val tripId: String)
 }

@@ -24,42 +24,42 @@ fun DTNavHost(
     val navHostController = rememberNavController()
     NavHost(
         navController = navHostController,
-        startDestination = mainViewModel.currentUser.value?.let
-        { Screen.Map.route }
-            ?: Screen.Login.route,
+        startDestination = mainViewModel.currentUser?.let
+        { Screen.Map }
+            ?: Screen.Login,
         modifier = modifier
     ) {
-        composable(Screen.Login.route) {
+        composable<Screen.Login> {
             val viewModel = hiltViewModel<LoginViewModel>()
             LoginScreen(viewModel = viewModel,
                 snackBarHostState = snackBarHostState,
                 onRegisterClicked = {
-                    navHostController.navigate(Screen.Register.route)
+                    navHostController.navigate(Screen.Register)
                 },
                 onLoginSuccess = {
-                    navHostController.navigate(Screen.Map.route) {
+                    navHostController.navigate(Screen.Map) {
                         popUpTo(0)
                     }
                 })
         }
 
-        composable(Screen.Register.route) {
+        composable<Screen.Register> {
             val viewModel = hiltViewModel<RegisterViewModel>()
             RegisterScreen(viewModel = viewModel,
                 snackBarHostState = snackBarHostState,
                 onRegistrationSuccess = {
-                    navHostController.navigate(Screen.Map.route) {
+                    navHostController.navigate(Screen.Map) {
                         popUpTo(0)
                     }
                 })
         }
 
-        composable(Screen.Map.route) {
+        composable<Screen.Map> {
             val viewModel = hiltViewModel<MapViewModel>()
-            MapScreen(viewModel = viewModel,
-                snackBarHostState = snackBarHostState,
+            MapScreen(
+                viewModel = viewModel,
                 onLogout = {
-                    navHostController.navigate(Screen.Login.route) {
+                    navHostController.navigate(Screen.Login) {
                         popUpTo(0)
                     }
                 })
