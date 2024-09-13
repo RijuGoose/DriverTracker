@@ -14,6 +14,10 @@ import com.riju.drivertracker.ui.map.MapScreen
 import com.riju.drivertracker.ui.map.MapViewModel
 import com.riju.drivertracker.ui.register.RegisterScreen
 import com.riju.drivertracker.ui.register.RegisterViewModel
+import com.riju.drivertracker.ui.tripdetails.TripDetailsScreen
+import com.riju.drivertracker.ui.tripdetails.TripDetailsViewModel
+import com.riju.drivertracker.ui.triphistory.TripHistoryScreen
+import com.riju.drivertracker.ui.triphistory.TripHistoryViewModel
 
 @Composable
 fun DTNavHost(
@@ -62,8 +66,28 @@ fun DTNavHost(
                     navHostController.navigate(Screen.Login) {
                         popUpTo(0)
                     }
+                },
+                navigateToTripHistory = {
+                    navHostController.navigate(Screen.TripHistory)
+                },
+                snackBarHostState = snackBarHostState,
+            )
+        }
+
+        composable<Screen.TripHistory> {
+            val viewModel = hiltViewModel<TripHistoryViewModel>()
+            TripHistoryScreen(viewModel = viewModel,
+                onTripSelected = { tripId ->
+                    navHostController.navigate(Screen.TripDetails(tripId = tripId))
                 })
         }
-    }
 
+        composable<Screen.TripDetails> {
+            val viewModel = hiltViewModel<TripDetailsViewModel>()
+            TripDetailsScreen(
+                viewModel = viewModel
+            )
+
+        }
+    }
 }

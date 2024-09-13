@@ -1,14 +1,17 @@
 package com.riju.drivertracker.repository
 
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DatabaseReference
+import com.riju.drivertracker.datasource.TrackingDataSource
+import com.riju.drivertracker.datasource.UserDataSource
+import com.riju.drivertracker.datasource.model.RoutePointApiModel
+import com.riju.drivertracker.datasource.model.TripDetailsApiModel
 import com.riju.drivertracker.service.model.TrackingPoint
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.UUID
 
 class TrackingRepositoryImpl(
-    private val database: DatabaseReference,
-    private val firebaseAuth: FirebaseAuth
+    private val trackingDataSource: TrackingDataSource,
+    private val userDataSource: UserDataSource
 ) : TrackingRepository {
     private var currentTripId: String? = null
     private var currentTripCounter: Int = 0
@@ -16,30 +19,29 @@ class TrackingRepositoryImpl(
     override fun startTracking() {
         currentTripId = UUID.randomUUID().toString()
         currentTripCounter = 0
-        firebaseAuth.currentUser?.let { currentUser ->
-            database
-                .child("users")
-                .child(currentUser.uid)
-                .child("trips")
-                .child(currentTripId.toString())
-                .child("startTime")
-                .setValue(LocalDateTime.now().toString())
-
+        userDataSource.getUser()?.let { currentUser ->
+            trackingDataSource.addTripDetails(
+                user = currentUser,
+                tripId = requireNotNull(currentTripId),
+                tripDetails = TripDetailsApiModel(
+                    tripName = "TripName ChangeMe",
+                    startTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+                    startLocation = "Start Location",
+                )
+            )
         }
     }
 
-    override fun addTrackingPoint(trackingPoint: TrackingPoint) {
-        firebaseAuth.currentUser?.let { currentUser ->
-            database
-                .child("users")
-                .child(currentUser.uid)
-                .child("tripLocations")
-                .child(currentTripId.toString())
-                .child(currentTripCounter.toString())
-                .setValue(trackingPoint)
-                .also {
-                    currentTripCounter++
-                }
+    override fun addRoutePoint(trackingPoint: TrackingPoint) {
+        userDataSource.getUser()?.let { currentUser ->
+            trackingDataSource.addRoutePoint(
+                user = currentUser,
+                tripId = requireNotNull(currentTripId),
+                routePoint = RoutePointApiModel(
+                    latitude = trackingPoint.lat,
+                    longitude = trackingPoint.lon
+                )
+            )
         }
     }
 

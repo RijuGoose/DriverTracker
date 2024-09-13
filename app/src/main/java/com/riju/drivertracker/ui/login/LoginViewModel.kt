@@ -1,10 +1,12 @@
 package com.riju.drivertracker.ui.login
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.riju.drivertracker.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -21,23 +23,24 @@ class LoginViewModel @Inject constructor(
     val loginStatus = _loginStatus.asStateFlow()
 
     fun login(email: String, password: String) {
-        try {
-            userRepository.login(
-                email = email,
-                password = password,
-                onCompleted = {
-                    if (it.isSuccessful) {
-                        _loginStatus.value = LoginStatus.Success
-                    } else {
-                        _loginStatus.value = LoginStatus.Failure(
-                            error = it.exception?.message ?: "Unknown error"
-                        )
-                    }
-                })
-        } catch (e: Exception) {
-            _loginStatus.value = LoginStatus.Failure(
-                error = e.message ?: "Unknown error"
-            )
+        viewModelScope.launch {
+            try {
+                val user = userRepository.login(
+                    email = email,
+                    password = password
+                )
+                if (user != null) {
+                    _loginStatus.value = LoginStatus.Success
+                } else {
+                    _loginStatus.value = LoginStatus.Failure(
+                        error = "Unknown error"
+                    )
+                }
+            } catch (e: Exception) {
+                _loginStatus.value = LoginStatus.Failure(
+                    error = e.message ?: "Unknown error"
+                )
+            }
         }
     }
 

@@ -81,6 +81,7 @@ dependencies {
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.database)
     implementation(libs.firebase.auth)
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.1")
     ksp(libs.hilt.compiler)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

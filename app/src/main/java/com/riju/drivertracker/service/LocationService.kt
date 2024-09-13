@@ -57,9 +57,10 @@ class LocationService : Service() {
             .catch { e -> e.printStackTrace() }
             .onStart {
                 notificationManager.notify(1, notification.build())
+                trackingRepository.startTracking()
             }
             .onEach { location ->
-                trackingRepository.addTrackingPoint(
+                trackingRepository.addRoutePoint(
                     TrackingPoint(location.latitude, location.longitude)
                 )
                 Log.d("libalog-speed", "speed: ${location.speed}")
@@ -67,7 +68,6 @@ class LocationService : Service() {
             .launchIn(serviceScope)
 
         startForeground(1, notification.build())
-        trackingRepository.startTracking()
     }
 
     private fun stop() {

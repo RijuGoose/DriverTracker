@@ -30,7 +30,8 @@ fun MapScreen(
     viewModel: MapViewModel,
     modifier: Modifier = Modifier,
     onLogout: () -> Unit,
-    snackBarHostState: SnackbarHostState
+    snackBarHostState: SnackbarHostState,
+    navigateToTripHistory: () -> Unit
 ) {
     val styleSpanList = remember { listOf(styleSpan) }
 
@@ -60,6 +61,9 @@ fun MapScreen(
         }
         Button(onClick = viewModel::logout) {
             Text(text = "Logout")
+        }
+        Button(onClick = navigateToTripHistory) {
+            Text(text = "Trip History")
         }
         GoogleMap(
             properties = MapProperties(
