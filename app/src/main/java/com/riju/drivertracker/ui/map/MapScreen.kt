@@ -7,23 +7,11 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import com.google.maps.android.compose.GoogleMap
-import com.google.android.gms.maps.model.StrokeStyle
-import com.google.android.gms.maps.model.StyleSpan
 import com.google.maps.android.compose.MapProperties
+import com.riju.drivertracker.ui.ScreenStatus
 import kotlinx.coroutines.flow.collectLatest
-
-val styleSpan = StyleSpan(
-    StrokeStyle.gradientBuilder(
-        Color.Red.toArgb(),
-        Color.Green.toArgb(),
-    )
-        .build()
-)
 
 @Composable
 fun MapScreen(
@@ -33,13 +21,11 @@ fun MapScreen(
     snackBarHostState: SnackbarHostState,
     navigateToTripHistory: () -> Unit
 ) {
-    val styleSpanList = remember { listOf(styleSpan) }
-
     LaunchedEffect(Unit) {
-        viewModel.logoutStatus.collectLatest {
+        viewModel.screenStatus.collectLatest {
             when (it) {
-                is LogoutState.Success -> onLogout()
-                is LogoutState.Failure -> {
+                is ScreenStatus.Success -> onLogout()
+                is ScreenStatus.Failure -> {
                     snackBarHostState.showSnackbar(it.error)
                 }
 

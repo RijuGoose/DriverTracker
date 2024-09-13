@@ -11,6 +11,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.riju.drivertracker.ui.ScreenStatus
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -25,11 +26,11 @@ fun LoginScreen(
     val password by viewModel.password.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        viewModel.loginStatus.collectLatest {
+        viewModel.screenStatus.collectLatest {
             when (it) {
-                is LoginStatus.Success -> onLoginSuccess()
+                is ScreenStatus.Success -> onLoginSuccess()
 
-                is LoginStatus.Failure -> {
+                is ScreenStatus.Failure -> {
                     snackBarHostState.showSnackbar(it.error)
                 }
 

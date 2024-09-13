@@ -1,8 +1,9 @@
 package com.riju.drivertracker.ui.login
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.riju.drivertracker.repository.UserRepository
+import com.riju.drivertracker.ui.BaseViewModel
+import com.riju.drivertracker.ui.ScreenStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -12,15 +13,12 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val userRepository: UserRepository
-) : ViewModel() {
+) : BaseViewModel() {
     private val _userName = MutableStateFlow("")
     val userName = _userName.asStateFlow()
 
     private val _password = MutableStateFlow("")
     val password = _password.asStateFlow()
-
-    private val _loginStatus = MutableStateFlow<LoginStatus?>(null)
-    val loginStatus = _loginStatus.asStateFlow()
 
     fun login(email: String, password: String) {
         viewModelScope.launch {
@@ -30,14 +28,14 @@ class LoginViewModel @Inject constructor(
                     password = password
                 )
                 if (user != null) {
-                    _loginStatus.value = LoginStatus.Success
+                    _screenStatus.value = ScreenStatus.Success
                 } else {
-                    _loginStatus.value = LoginStatus.Failure(
+                    _screenStatus.value = ScreenStatus.Failure(
                         error = "Unknown error"
                     )
                 }
             } catch (e: Exception) {
-                _loginStatus.value = LoginStatus.Failure(
+                _screenStatus.value = ScreenStatus.Failure(
                     error = e.message ?: "Unknown error"
                 )
             }
@@ -51,10 +49,4 @@ class LoginViewModel @Inject constructor(
     fun setPassword(password: String) {
         _password.value = password
     }
-}
-
-
-sealed class LoginStatus {
-    data object Success : LoginStatus()
-    data class Failure(val error: String) : LoginStatus()
 }

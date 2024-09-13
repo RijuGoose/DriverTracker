@@ -2,8 +2,8 @@ package com.riju.drivertracker.repository
 
 import com.riju.drivertracker.datasource.TrackingDataSource
 import com.riju.drivertracker.datasource.UserDataSource
-import com.riju.drivertracker.datasource.model.RoutePointApiModel
-import com.riju.drivertracker.datasource.model.TripDetailsApiModel
+import com.riju.drivertracker.datasource.model.routepoint.RoutePointRequest
+import com.riju.drivertracker.datasource.model.tripdetails.TripDetailsRequest
 import com.riju.drivertracker.service.model.TrackingPoint
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -23,7 +23,7 @@ class TrackingRepositoryImpl(
             trackingDataSource.addTripDetails(
                 user = currentUser,
                 tripId = requireNotNull(currentTripId),
-                tripDetails = TripDetailsApiModel(
+                tripDetails = TripDetailsRequest(
                     tripName = "TripName ChangeMe",
                     startTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
                     startLocation = "Start Location",
@@ -37,7 +37,8 @@ class TrackingRepositoryImpl(
             trackingDataSource.addRoutePoint(
                 user = currentUser,
                 tripId = requireNotNull(currentTripId),
-                routePoint = RoutePointApiModel(
+                pointCount = currentTripCounter++,
+                routePoint = RoutePointRequest(
                     latitude = trackingPoint.lat,
                     longitude = trackingPoint.lon
                 )

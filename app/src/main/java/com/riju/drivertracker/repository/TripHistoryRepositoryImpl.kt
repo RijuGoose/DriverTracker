@@ -26,12 +26,12 @@ class TripHistoryRepositoryImpl(
 
     override suspend fun getTripHistoryRouteById(tripId: String): List<TrackingPoint>? {
         return userDataSource.getUser()?.let { currentUser ->
-            emptyList()
-//            database
-//                .child(DatabaseConstants.LIST_USERS)
-//                .child(currentUser.uid)
-//                .child(DatabaseConstants.LIST_TRIP_LOCATIONS)
-//                .child(tripId).get().await().getValue<List<TrackingPoint>>()
+            trackingDataSource.getTripHistoryRouteById(currentUser, tripId)?.map { routePoint ->
+                TrackingPoint(
+                    lat = routePoint.latitude,
+                    lon = routePoint.longitude
+                )
+            }
         }
     }
 }

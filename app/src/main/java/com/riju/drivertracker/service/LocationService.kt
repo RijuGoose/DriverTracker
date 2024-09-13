@@ -61,7 +61,7 @@ class LocationService : Service() {
             }
             .onEach { location ->
                 trackingRepository.addRoutePoint(
-                    TrackingPoint(location.latitude, location.longitude)
+                    TrackingPoint(lat = location.latitude, lon = location.longitude)
                 )
                 Log.d("libalog-speed", "speed: ${location.speed}")
             }
