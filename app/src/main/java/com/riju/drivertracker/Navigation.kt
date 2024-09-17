@@ -21,8 +21,7 @@ import com.riju.drivertracker.ui.triphistory.TripHistoryViewModel
 
 @Composable
 fun DTNavHost(
-    modifier: Modifier,
-    snackBarHostState: SnackbarHostState,
+    modifier: Modifier = Modifier,
     mainViewModel: MainViewModel
 ) {
     val navHostController = rememberNavController()
@@ -36,7 +35,6 @@ fun DTNavHost(
         composable<Screen.Login> {
             val viewModel = hiltViewModel<LoginViewModel>()
             LoginScreen(viewModel = viewModel,
-                snackBarHostState = snackBarHostState,
                 onRegisterClicked = {
                     navHostController.navigate(Screen.Register)
                 },
@@ -50,7 +48,6 @@ fun DTNavHost(
         composable<Screen.Register> {
             val viewModel = hiltViewModel<RegisterViewModel>()
             RegisterScreen(viewModel = viewModel,
-                snackBarHostState = snackBarHostState,
                 onRegistrationSuccess = {
                     navHostController.navigate(Screen.Map) {
                         popUpTo(0)
@@ -70,7 +67,6 @@ fun DTNavHost(
                 navigateToTripHistory = {
                     navHostController.navigate(Screen.TripHistory)
                 },
-                snackBarHostState = snackBarHostState,
             )
         }
 

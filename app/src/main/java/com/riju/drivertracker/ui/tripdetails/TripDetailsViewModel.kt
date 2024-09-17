@@ -1,10 +1,10 @@
 package com.riju.drivertracker.ui.tripdetails
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import com.riju.drivertracker.repository.TripHistoryRepository
 import com.riju.drivertracker.ui.BaseViewModel
 import com.riju.drivertracker.ui.Screen
@@ -24,17 +24,29 @@ class TripDetailsViewModel @Inject constructor(
     private val _tripPoints = MutableStateFlow<List<LatLng>>(emptyList())
     var tripPoints = _tripPoints.asStateFlow()
 
+    private val _mapBounds =
+        MutableStateFlow(
+            LatLngBounds(
+                LatLng(47.473889, 19.040833),
+                LatLng(47.508611, 19.081944)
+            ) //Budapest city centre
+        )
+    val mapBounds = _mapBounds.asStateFlow()
+
     init {
         viewModelScope.launch {
             try {
                 _tripPoints.value = tripHistoryRepository.getTripHistoryRouteById(tripId)?.map {
                     LatLng(it.lat, it.lon)
                 } ?: emptyList()
+                val boundsBuilder = LatLngBounds.builder()
+                for (point in _tripPoints.value) {
+                    boundsBuilder.include(point)
+                }
+                _mapBounds.value = boundsBuilder.build()
                 _screenStatus.value = ScreenStatus.Success
-                Log.d("libalog", _tripPoints.value.toString())
             } catch (e: Exception) {
-                Log.e("libalog", e.message ?: "Unknown error")
-                _screenStatus.value = ScreenStatus.Failure(e.message ?: "Unknown error")
+                _screenStatus.value = ScreenStatus.ErrorFullScreen(e.message ?: "Unknown error")
             }
         }
     }

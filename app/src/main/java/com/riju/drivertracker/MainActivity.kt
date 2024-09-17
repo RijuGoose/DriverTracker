@@ -28,7 +28,7 @@ class MainActivity : ComponentActivity() {
         val mainViewModel by viewModels<MainViewModel>()
 
         enableEdgeToEdge()
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 "location",
                 "Location",
@@ -48,18 +48,9 @@ class MainActivity : ComponentActivity() {
         )
         setContent {
             DriverTrackerTheme {
-                val snackBarHostState = remember { SnackbarHostState() }
-                Scaffold(
-                    snackbarHost = {
-                        SnackbarHost(hostState = snackBarHostState)
-                    }
-                ) {
-                    DTNavHost(
-                        mainViewModel = mainViewModel,
-                        modifier = Modifier.padding(it),
-                        snackBarHostState = snackBarHostState
-                    )
-                }
+                DTNavHost(
+                    mainViewModel = mainViewModel
+                )
             }
         }
     }

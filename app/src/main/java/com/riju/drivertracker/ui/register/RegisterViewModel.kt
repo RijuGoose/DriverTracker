@@ -5,7 +5,9 @@ import com.riju.drivertracker.repository.UserRepository
 import com.riju.drivertracker.ui.BaseViewModel
 import com.riju.drivertracker.ui.ScreenStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -20,15 +22,20 @@ class RegisterViewModel @Inject constructor(
     private val _password = MutableStateFlow("")
     val password = _password.asStateFlow()
 
+    private val _onRegistrationSuccess = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    val onRegistrationSuccess = _onRegistrationSuccess.asSharedFlow()
+
     fun register(email: String, password: String) {
         viewModelScope.launch {
+            _screenStatus.value = ScreenStatus.Loading
             try {
                 val user = userRepository.register(email, password)
                 if (user != null) {
                     _screenStatus.tryEmit(ScreenStatus.Success)
+                    _onRegistrationSuccess.tryEmit(Unit)
                 } else {
                     _screenStatus.tryEmit(
-                        ScreenStatus.Failure(
+                        ScreenStatus.Error(
                             error = "Unknown error"
                         )
                     )
@@ -36,7 +43,7 @@ class RegisterViewModel @Inject constructor(
 
             } catch (e: Exception) {
                 _screenStatus.tryEmit(
-                    ScreenStatus.Failure(
+                    ScreenStatus.Error(
                         error = e.message ?: "Unknown error"
                     )
                 )

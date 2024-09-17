@@ -20,11 +20,12 @@ class TripHistoryViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
+            _screenStatus.value = ScreenStatus.LoadingFullScreen
             try {
                 _tripHistory.value = tripHistoryRepository.getAllTripHistory() ?: emptyList()
                 _screenStatus.value = ScreenStatus.Success
             } catch (e: Exception) {
-                _screenStatus.value = ScreenStatus.Failure(
+                _screenStatus.value = ScreenStatus.ErrorFullScreen(
                     error = e.message ?: "Unknown error"
                 )
             }

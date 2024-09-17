@@ -1,49 +1,51 @@
 package com.riju.drivertracker.ui.tripdetails
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.google.android.gms.maps.model.StrokeStyle
-import com.google.android.gms.maps.model.StyleSpan
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.Polyline
-
-
-val styleSpan = StyleSpan(
-    StrokeStyle.gradientBuilder(
-        Color.Red.toArgb(),
-        Color.Green.toArgb(),
-    )
-        .build()
-)
+import com.google.maps.android.compose.rememberCameraPositionState
+import com.riju.drivertracker.ui.DTScaffold
 
 @Composable
 fun TripDetailsScreen(
     viewModel: TripDetailsViewModel
 ) {
-    val styleSpanList = remember { listOf(styleSpan) }
-
     val tripPoints by viewModel.tripPoints.collectAsStateWithLifecycle()
-    Column(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        GoogleMap(
-            properties = MapProperties(
-                isMyLocationEnabled = true
+    val mapBounds by viewModel.mapBounds.collectAsStateWithLifecycle()
+
+    val cameraPositionState = rememberCameraPositionState()
+
+    LaunchedEffect(mapBounds) {
+        cameraPositionState.move(
+            update = CameraUpdateFactory.newLatLngBounds(
+                mapBounds,
+                200
             )
-        ) {
-            if (tripPoints.isNotEmpty()) {
-                Polyline(
-                    points = tripPoints,
-                    spans = styleSpanList,
-                )
+        )
+    }
+
+    DTScaffold(viewModel = viewModel) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            GoogleMap(
+                properties = MapProperties(
+                    isMyLocationEnabled = true
+                ),
+                cameraPositionState = cameraPositionState
+            ) {
+                if (tripPoints.isNotEmpty()) {
+                    Polyline(
+                        points = tripPoints
+                    )
+                }
             }
         }
     }
