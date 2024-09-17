@@ -29,7 +29,7 @@ class TrackingDataSourceImpl(
             .child(DatabaseConstants.LIST_TRIP_LOCATIONS)
             .child(tripId)
             .child(pointCount.toString())
-            //.push()
+            // .push()
             .setValue(routePoint)
     }
 
@@ -38,7 +38,7 @@ class TrackingDataSourceImpl(
             .child(DatabaseConstants.LIST_USERS)
             .child(user.uid)
             .child(DatabaseConstants.LIST_TRIPS)
-            //.orderByChild(DatabaseConstants.FIELD_START_TIME)
+            // .orderByChild(DatabaseConstants.FIELD_START_TIME)
             .get().await().getValue<Map<String, TripDetailsResponse>>()
     }
 

@@ -39,7 +39,6 @@ class LocationService : Service() {
         when (intent?.action) {
             ACTION_START -> start()
             ACTION_STOP -> stop()
-
         }
         return super.onStartCommand(intent, flags, startId)
     }
@@ -53,7 +52,7 @@ class LocationService : Service() {
 
         val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
 
-        locationRepository.getLocationUpdates(2000L)
+        locationRepository.getLocationUpdates(LOCATION_UPDATE_DELAY)
             .catch { e -> e.printStackTrace() }
             .onStart {
                 notificationManager.notify(1, notification.build())
@@ -84,5 +83,6 @@ class LocationService : Service() {
     companion object {
         const val ACTION_START = "ACTION_START"
         const val ACTION_STOP = "ACTION_STOP"
+        const val LOCATION_UPDATE_DELAY = 2000L
     }
 }

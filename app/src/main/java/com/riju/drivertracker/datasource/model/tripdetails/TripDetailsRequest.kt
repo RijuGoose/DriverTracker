@@ -6,4 +6,4 @@ data class TripDetailsRequest(
     override val startLocation: String,
     override val endLocation: String? = null,
     override val endTime: String? = null,
-): TripDetailsApiModel()
+) : TripDetailsApiModel()

@@ -23,7 +23,7 @@ fun MapScreen(
         }
     }
 
-    DTScaffold( viewModel = viewModel) {
+    DTScaffold(viewModel = viewModel) {
         Column(
             modifier = modifier.fillMaxSize()
         ) {

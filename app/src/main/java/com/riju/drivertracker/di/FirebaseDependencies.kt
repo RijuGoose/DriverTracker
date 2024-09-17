@@ -12,16 +12,16 @@ import dagger.hilt.components.SingletonComponent
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class FirebaseDependencies {
-    companion object {
-        @Provides
-        fun provideFirebaseAuth(): FirebaseAuth {
-            return Firebase.auth
-        }
+object FirebaseDependencies {
+    @Provides
+    fun provideFirebaseAuth(): FirebaseAuth {
+        return Firebase.auth
+    }
 
-        @Provides
-        fun provideDatabaseReference(): DatabaseReference {
-            return Firebase.database("https://drivertracker-b34d5-default-rtdb.europe-west1.firebasedatabase.app/").reference
-        }
+    @Provides
+    fun provideDatabaseReference(): DatabaseReference {
+        return Firebase.database(
+            "https://drivertracker-b34d5-default-rtdb.europe-west1.firebasedatabase.app/"
+        ).reference
     }
 }

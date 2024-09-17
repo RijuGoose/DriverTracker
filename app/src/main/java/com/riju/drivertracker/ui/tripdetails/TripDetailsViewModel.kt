@@ -29,7 +29,7 @@ class TripDetailsViewModel @Inject constructor(
             LatLngBounds(
                 LatLng(47.473889, 19.040833),
                 LatLng(47.508611, 19.081944)
-            ) //Budapest city centre
+            ) // Budapest city centre
         )
     val mapBounds = _mapBounds.asStateFlow()
 
@@ -49,5 +49,9 @@ class TripDetailsViewModel @Inject constructor(
                 _screenStatus.value = ScreenStatus.ErrorFullScreen(e.message ?: "Unknown error")
             }
         }
+    }
+
+    companion object {
+        const val CAMERA_PADDING = 200
     }
 }

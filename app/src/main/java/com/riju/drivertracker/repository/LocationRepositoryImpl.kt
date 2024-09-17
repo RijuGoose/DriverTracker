@@ -31,14 +31,14 @@ class LocationRepositoryImpl(
                     Manifest.permission.ACCESS_COARSE_LOCATION
                 ) != PackageManager.PERMISSION_GRANTED
             ) {
-                //TODO if permission is not granted, emit error
+                // TODO if permission is not granted, emit error
             }
 
             val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
             val isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
             val isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
             if (!isGpsEnabled && !isNetworkEnabled) {
-                //TODO emit error
+                // TODO emit error
             }
 
             val request = LocationRequest.Builder(interval).build()

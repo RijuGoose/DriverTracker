@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 open class BaseViewModel : ViewModel() {
+    @Suppress("VariableNaming")
     protected val _screenStatus = MutableStateFlow<ScreenStatus?>(ScreenStatus.Success)
     val screenStatus = _screenStatus.asStateFlow()
 }

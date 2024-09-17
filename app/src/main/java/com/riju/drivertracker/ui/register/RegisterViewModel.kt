@@ -40,7 +40,6 @@ class RegisterViewModel @Inject constructor(
                         )
                     )
                 }
-
             } catch (e: Exception) {
                 _screenStatus.tryEmit(
                     ScreenStatus.Error(

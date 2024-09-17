@@ -1,6 +1,5 @@
 package com.riju.drivertracker
 
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -28,13 +27,14 @@ fun DTNavHost(
     NavHost(
         navController = navHostController,
         startDestination = mainViewModel.currentUser?.let
-        { Screen.Map }
+            { Screen.Map }
             ?: Screen.Login,
         modifier = modifier
     ) {
         composable<Screen.Login> {
             val viewModel = hiltViewModel<LoginViewModel>()
-            LoginScreen(viewModel = viewModel,
+            LoginScreen(
+                viewModel = viewModel,
                 onRegisterClicked = {
                     navHostController.navigate(Screen.Register)
                 },
@@ -42,17 +42,20 @@ fun DTNavHost(
                     navHostController.navigate(Screen.Map) {
                         popUpTo(0)
                     }
-                })
+                }
+            )
         }
 
         composable<Screen.Register> {
             val viewModel = hiltViewModel<RegisterViewModel>()
-            RegisterScreen(viewModel = viewModel,
+            RegisterScreen(
+                viewModel = viewModel,
                 onRegistrationSuccess = {
                     navHostController.navigate(Screen.Map) {
                         popUpTo(0)
                     }
-                })
+                }
+            )
         }
 
         composable<Screen.Map> {
@@ -72,10 +75,12 @@ fun DTNavHost(
 
         composable<Screen.TripHistory> {
             val viewModel = hiltViewModel<TripHistoryViewModel>()
-            TripHistoryScreen(viewModel = viewModel,
+            TripHistoryScreen(
+                viewModel = viewModel,
                 onTripSelected = { tripId ->
                     navHostController.navigate(Screen.TripDetails(tripId = tripId))
-                })
+                }
+            )
         }
 
         composable<Screen.TripDetails> {
@@ -83,7 +88,6 @@ fun DTNavHost(
             TripDetailsScreen(
                 viewModel = viewModel
             )
-
         }
     }
 }

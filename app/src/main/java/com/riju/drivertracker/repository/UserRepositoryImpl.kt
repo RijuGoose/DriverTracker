@@ -20,7 +20,8 @@ class UserRepositoryImpl(
     }
 
     override suspend fun register(
-        email: String, password: String
+        email: String,
+        password: String
     ): FirebaseUser? {
         return userDataSource.register(email, password)
     }

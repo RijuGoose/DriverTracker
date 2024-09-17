@@ -56,9 +56,11 @@ fun DTScaffold(
         contentColor = contentColor,
         contentWindowInsets = contentWindowInsets
     ) {
-        Box(modifier = Modifier
-            .fillMaxSize()
-            .padding(it)) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(it)
+        ) {
             when (val status = screenStatus) {
                 is ScreenStatus.LoadingFullScreen -> {
                     Box(
@@ -94,8 +96,10 @@ fun DTScaffold(
                 }
 
                 is ScreenStatus.ErrorFullScreen -> {
-                    Box(modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
                         Text(text = status.error)
                     }
                 }
@@ -104,7 +108,6 @@ fun DTScaffold(
                     /* no-op */
                 }
             }
-
         }
     }
 }

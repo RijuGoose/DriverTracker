@@ -12,16 +12,14 @@ import dagger.hilt.components.SingletonComponent
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class UserDependencies {
-    companion object {
-        @Provides
-        fun provideUserRepositoryImpl(userDataSource: UserDataSource): UserRepository {
-            return UserRepositoryImpl(userDataSource)
-        }
+object UserDependencies {
+    @Provides
+    fun provideUserRepositoryImpl(userDataSource: UserDataSource): UserRepository {
+        return UserRepositoryImpl(userDataSource)
+    }
 
-        @Provides
-        fun provideUserDataSourceImpl(firebaseAuth: FirebaseAuth): UserDataSource {
-            return UserDataSourceImpl(firebaseAuth)
-        }
+    @Provides
+    fun provideUserDataSourceImpl(firebaseAuth: FirebaseAuth): UserDataSource {
+        return UserDataSourceImpl(firebaseAuth)
     }
 }

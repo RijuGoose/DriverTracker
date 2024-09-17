@@ -1,6 +1,5 @@
 package com.riju.drivertracker.ui.tripdetails
 
-import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -28,7 +27,7 @@ fun TripDetailsScreen(
         cameraPositionState.move(
             update = CameraUpdateFactory.newLatLngBounds(
                 mapBounds,
-                200
+                TripDetailsViewModel.CAMERA_PADDING
             )
         )
     }

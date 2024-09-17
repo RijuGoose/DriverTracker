@@ -9,7 +9,7 @@ import kotlinx.coroutines.tasks.await
 
 class UserDataSourceImpl(
     private val firebaseAuth: FirebaseAuth,
-): UserDataSource {
+) : UserDataSource {
     override fun getUserFlow(): Flow<FirebaseUser?> {
         return callbackFlow {
             val authStateListener = FirebaseAuth.AuthStateListener { auth ->

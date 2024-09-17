@@ -13,16 +13,17 @@ import dagger.hilt.components.SingletonComponent
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class LocationDependencies {
-    companion object {
-        @Provides
-        fun provideFusedLocationProviderClient(@ApplicationContext context: Context): FusedLocationProviderClient {
-            return LocationServices.getFusedLocationProviderClient(context)
-        }
+object LocationDependencies {
+    @Provides
+    fun provideFusedLocationProviderClient(@ApplicationContext context: Context): FusedLocationProviderClient {
+        return LocationServices.getFusedLocationProviderClient(context)
+    }
 
-        @Provides
-        fun provideLocationRepositoryImpl(@ApplicationContext context: Context, client: FusedLocationProviderClient): LocationRepository {
-            return LocationRepositoryImpl(context, client)
-        }
+    @Provides
+    fun provideLocationRepositoryImpl(
+        @ApplicationContext context: Context,
+        client: FusedLocationProviderClient
+    ): LocationRepository {
+        return LocationRepositoryImpl(context, client)
     }
 }
