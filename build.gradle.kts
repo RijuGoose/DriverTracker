@@ -25,7 +25,7 @@ dependencies {
 tasks.register<Detekt>("detektAll") {
     val autoFix = project.hasProperty("detektAutoFix")
     config.setFrom(file("config/detekt/detekt.yml"))
-    buildUponDefaultConfig = false
+    buildUponDefaultConfig = true
     description = "detekt all"
     setSource(projectDir)
     parallel = true
