@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
+import java.math.RoundingMode
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -60,9 +61,12 @@ class LocationService : Service() {
             }
             .onEach { location ->
                 trackingRepository.addRoutePoint(
-                    TrackingPoint(lat = location.latitude, lon = location.longitude)
+                    TrackingPoint(
+                        lat = location.latitude,
+                        lon = location.longitude,
+                        speed = (location.speed * 3.6).toBigDecimal().setScale(2, RoundingMode.HALF_UP).toDouble()
+                    )
                 )
-                Log.d("libalog-speed", "speed: ${location.speed}")
             }
             .launchIn(serviceScope)
 

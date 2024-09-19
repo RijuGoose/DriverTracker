@@ -9,9 +9,9 @@ class TripHistoryRepositoryImpl(
     private val trackingDataSource: TrackingDataSource,
     private val userDataSource: UserDataSource
 ) : TripHistoryRepository {
-    override suspend fun getAllTripHistory(): List<TripDetails>? {
+    override suspend fun getAllTripHistory(orderBy: String): List<TripDetails>? {
         return userDataSource.getUser()?.let { currentUser ->
-            trackingDataSource.getAllTripHistory(currentUser)?.map { tripDetails ->
+            trackingDataSource.getAllTripHistory(currentUser, orderBy)?.map { tripDetails ->
                 TripDetails(
                     tripId = tripDetails.key,
                     tripName = tripDetails.value.tripName,
@@ -29,7 +29,23 @@ class TripHistoryRepositoryImpl(
             trackingDataSource.getTripHistoryRouteById(currentUser, tripId)?.map { routePoint ->
                 TrackingPoint(
                     lat = routePoint.latitude,
-                    lon = routePoint.longitude
+                    lon = routePoint.longitude,
+                    speed = routePoint.speed
+                )
+            }
+        }
+    }
+
+    override suspend fun getTripDetails(tripId: String): TripDetails? {
+        return userDataSource.getUser()?.let { currentUser ->
+            trackingDataSource.getTripDetails(currentUser, tripId).let { tripDetails ->
+                TripDetails(
+                    tripId = tripId,
+                    tripName = requireNotNull(tripDetails?.tripName),
+                    startTime = requireNotNull(tripDetails?.startTime),
+                    endTime = tripDetails?.endTime,
+                    startLocation = requireNotNull(tripDetails?.startLocation),
+                    endLocation = tripDetails?.endLocation,
                 )
             }
         }

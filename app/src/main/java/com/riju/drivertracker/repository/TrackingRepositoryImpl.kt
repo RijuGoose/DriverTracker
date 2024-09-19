@@ -25,7 +25,7 @@ class TrackingRepositoryImpl(
                 tripId = requireNotNull(currentTripId),
                 tripDetails = TripDetailsRequest(
                     tripName = "TripName ChangeMe",
-                    startTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+                    startTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")),
                     startLocation = "Start Location",
                 )
             )
@@ -40,7 +40,8 @@ class TrackingRepositoryImpl(
                 pointCount = currentTripCounter++,
                 routePoint = RoutePointRequest(
                     latitude = trackingPoint.lat,
-                    longitude = trackingPoint.lon
+                    longitude = trackingPoint.lon,
+                    speed = trackingPoint.speed
                 )
             )
         }

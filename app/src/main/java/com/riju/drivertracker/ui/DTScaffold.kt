@@ -1,6 +1,7 @@
 package com.riju.drivertracker.ui
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -15,21 +16,25 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @Composable
-fun DTScaffold(
-    viewModel: BaseViewModel,
-    modifier: Modifier = Modifier.padding(horizontal = 8.dp),
+fun <T : Any> DTScaffold(
+    viewModel: BaseViewModel<T>,
+    modifier: Modifier = Modifier,
+    horizontalPadding: Dp = 8.dp,
     topBar: @Composable () -> Unit = {},
     bottomBar: @Composable () -> Unit = {},
     floatingActionButton: @Composable () -> Unit = {},
@@ -37,14 +42,23 @@ fun DTScaffold(
     containerColor: Color = MaterialTheme.colorScheme.background,
     contentColor: Color = contentColorFor(containerColor),
     contentWindowInsets: WindowInsets = ScaffoldDefaults.contentWindowInsets,
-    content: @Composable () -> Unit = {}
+    content: @Composable BoxScope.(T) -> Unit
 ) {
     val snackBarHostState = remember { SnackbarHostState() }
     val screenStatus by viewModel.screenStatus.collectAsStateWithLifecycle()
+    val showLoadingDialog by viewModel.showLoadingDialog.collectAsStateWithLifecycle()
 
     val coroutineScope = rememberCoroutineScope()
+    LaunchedEffect(Unit) {
+        viewModel.errorState.collectLatest { error ->
+            coroutineScope.launch {
+                snackBarHostState.showSnackbar(error)
+            }
+        }
+    }
+
     Scaffold(
-        modifier = modifier,
+        modifier = modifier.padding(horizontal = horizontalPadding),
         topBar = topBar,
         bottomBar = bottomBar,
         floatingActionButton = floatingActionButton,
@@ -71,28 +85,8 @@ fun DTScaffold(
                     }
                 }
 
-                is ScreenStatus.Loading -> {
-                    content()
-                    Dialog(onDismissRequest = {}) {
-                        Card {
-                            CircularProgressIndicator(
-                                modifier = Modifier
-                                    .padding(16.dp)
-                                    .align(Alignment.CenterHorizontally)
-                            )
-                        }
-                    }
-                }
-
                 is ScreenStatus.Success -> {
-                    content()
-                }
-
-                is ScreenStatus.Error -> {
-                    content()
-                    coroutineScope.launch {
-                        snackBarHostState.showSnackbar(status.error)
-                    }
+                    content(this, status.value)
                 }
 
                 is ScreenStatus.ErrorFullScreen -> {
@@ -103,9 +97,17 @@ fun DTScaffold(
                         Text(text = status.error)
                     }
                 }
+            }
 
-                else -> {
-                    /* no-op */
+            if (showLoadingDialog) {
+                Dialog(onDismissRequest = {}) {
+                    Card {
+                        CircularProgressIndicator(
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .align(Alignment.CenterHorizontally)
+                        )
+                    }
                 }
             }
         }

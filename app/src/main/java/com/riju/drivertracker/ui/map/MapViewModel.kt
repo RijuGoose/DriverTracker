@@ -16,36 +16,37 @@ import javax.inject.Inject
 class MapViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val userRepository: UserRepository,
-) : BaseViewModel() {
+) : BaseViewModel<Unit>(defaultScreenState = ScreenStatus.Success(Unit)) {
     private val _onLogoutSuccess = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     val onLogoutSuccess = _onLogoutSuccess.asSharedFlow()
 
     fun startLocationService() {
-        _screenStatus.value = ScreenStatus.Loading
+        showLoadingDialog()
         Intent(context, LocationService::class.java).apply {
             action = LocationService.ACTION_START
             context.startService(this)
         }
-        _screenStatus.value = ScreenStatus.Success
+        hideLoadingDialog()
     }
 
     fun stopLocationService() {
-        _screenStatus.value = ScreenStatus.Loading
+        showLoadingDialog()
         Intent(context, LocationService::class.java).apply {
             action = LocationService.ACTION_STOP
             context.startService(this)
         }
-        _screenStatus.value = ScreenStatus.Success
+        hideLoadingDialog()
     }
 
     fun logout() {
-        _screenStatus.value = ScreenStatus.Loading
+        showLoadingDialog()
         try {
             userRepository.logout()
-            _screenStatus.value = ScreenStatus.Success
             _onLogoutSuccess.tryEmit(Unit)
         } catch (e: Exception) {
-            _screenStatus.value = ScreenStatus.Error(e.message ?: "Unknown error")
+            showError(e.message ?: "Unknown error")
+        } finally {
+            hideLoadingDialog()
         }
     }
 }

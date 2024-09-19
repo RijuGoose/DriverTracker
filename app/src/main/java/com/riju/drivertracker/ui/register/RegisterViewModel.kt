@@ -15,7 +15,7 @@ import javax.inject.Inject
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
     private val userRepository: UserRepository
-) : BaseViewModel() {
+) : BaseViewModel<Unit>(defaultScreenState = ScreenStatus.Success(Unit)) {
     private val _userName = MutableStateFlow("")
     val userName = _userName.asStateFlow()
 
@@ -27,25 +27,18 @@ class RegisterViewModel @Inject constructor(
 
     fun register(email: String, password: String) {
         viewModelScope.launch {
-            _screenStatus.value = ScreenStatus.Loading
+            showLoadingDialog()
             try {
                 val user = userRepository.register(email, password)
                 if (user != null) {
-                    _screenStatus.tryEmit(ScreenStatus.Success)
                     _onRegistrationSuccess.tryEmit(Unit)
                 } else {
-                    _screenStatus.tryEmit(
-                        ScreenStatus.Error(
-                            error = "Unknown error"
-                        )
-                    )
+                    showError("Unknown error")
                 }
             } catch (e: Exception) {
-                _screenStatus.tryEmit(
-                    ScreenStatus.Error(
-                        error = e.message ?: "Unknown error"
-                    )
-                )
+                showError(e.message ?: "Unknown error")
+            } finally {
+                hideLoadingDialog()
             }
         }
     }

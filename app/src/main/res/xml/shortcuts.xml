@@ -1,0 +1,20 @@
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:enabled="true"
+        android:icon="@drawable/ic_launcher_foreground"
+        android:shortcutDisabledMessage="@string/app_shortcut_disabled_message"
+        android:shortcutId="shortcut_start_driving"
+        android:shortcutLongLabel="@string/app_shortcut_long_label"
+        android:shortcutShortLabel="@string/app_shortcut_short_label">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="com.riju.drivertracker.TripManagerActivity"
+            android:targetPackage="com.riju.drivertracker">
+            <extra
+                android:name="tripStatus"
+                android:value="${LocationService.ACTION_START}" />
+        </intent>
+        <capability-binding android:key="actions.intent.OPEN_APP_FEATURE" />
+    </shortcut>
+</shortcuts>
+  
