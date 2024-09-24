@@ -23,7 +23,7 @@ class MapViewModel @Inject constructor(
     fun startLocationService() {
         showLoadingDialog()
         Intent(context, LocationService::class.java).apply {
-            action = LocationService.ACTION_START
+            action = LocationService.ACTION_TRIP_START
             context.startService(this)
         }
         hideLoadingDialog()
@@ -32,7 +32,7 @@ class MapViewModel @Inject constructor(
     fun stopLocationService() {
         showLoadingDialog()
         Intent(context, LocationService::class.java).apply {
-            action = LocationService.ACTION_STOP
+            action = LocationService.ACTION_TRIP_STOP
             context.startService(this)
         }
         hideLoadingDialog()

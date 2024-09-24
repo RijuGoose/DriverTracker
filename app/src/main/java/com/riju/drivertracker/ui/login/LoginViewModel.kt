@@ -16,8 +16,8 @@ import javax.inject.Inject
 class LoginViewModel @Inject constructor(
     private val userRepository: UserRepository
 ) : BaseViewModel<Unit>(defaultScreenState = ScreenStatus.Success(Unit)) {
-    private val _userName = MutableStateFlow("")
-    val userName = _userName.asStateFlow()
+    private val _email = MutableStateFlow("")
+    val email = _email.asStateFlow()
 
     private val _password = MutableStateFlow("")
     val password = _password.asStateFlow()
@@ -47,8 +47,8 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    fun setUserName(userName: String) {
-        _userName.value = userName
+    fun setEmail(email: String) {
+        _email.value = email
     }
 
     fun setPassword(password: String) {

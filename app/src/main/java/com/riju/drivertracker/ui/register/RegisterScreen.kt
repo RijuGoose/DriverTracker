@@ -10,7 +10,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.riju.drivertracker.ui.DTScaffold
+import com.riju.drivertracker.ui.uicomponents.DTScaffold
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable

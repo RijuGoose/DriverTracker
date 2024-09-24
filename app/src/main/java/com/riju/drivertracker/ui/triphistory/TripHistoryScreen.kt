@@ -15,7 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.riju.drivertracker.ui.DTScaffold
+import com.riju.drivertracker.ui.uicomponents.DTScaffold
 
 @Composable
 fun TripHistoryScreen(

@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">DriverTracker</string>
-    <string name="app_shortcut_short_label">Short label</string>
-    <string name="app_shortcut_long_label">Long label</string>
-    <string name="app_shortcut_disabled_message">Disabled message</string>
+    <string name="app_shortcut_start_trip_short_label">Start trip</string>
+    <string name="app_shortcut_start_trip_long_label">Start the trip to track the driving</string>
+    <string name="app_shortcut_stop_trip_short_label">Stop trip</string>
+    <string name="app_shortcut_stop_trip_long_label">Stop the current driving trip</string>
+    <string name="app_shortcut_disabled_message">Placeholder disabled message</string>
 </resources>

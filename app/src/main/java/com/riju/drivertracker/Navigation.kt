@@ -6,7 +6,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.riju.drivertracker.ui.CurrentTripAction
 import com.riju.drivertracker.ui.Screen
+import com.riju.drivertracker.ui.currenttrip.CurrentTripScreen
+import com.riju.drivertracker.ui.currenttrip.CurrentTripViewModel
 import com.riju.drivertracker.ui.login.LoginScreen
 import com.riju.drivertracker.ui.login.LoginViewModel
 import com.riju.drivertracker.ui.map.MapScreen
@@ -26,9 +29,7 @@ fun DTNavHost(
     val navHostController = rememberNavController()
     NavHost(
         navController = navHostController,
-        startDestination = mainViewModel.currentUser?.let
-            { Screen.Map }
-            ?: Screen.Login,
+        startDestination = mainViewModel.startScreen,
         modifier = modifier
     ) {
         composable<Screen.Login> {
@@ -70,6 +71,9 @@ fun DTNavHost(
                 navigateToTripHistory = {
                     navHostController.navigate(Screen.TripHistory)
                 },
+                navigateToCurrentTrip = {
+                    navHostController.navigate(Screen.CurrentTrip(action = CurrentTripAction.None))
+                }
             )
         }
 
@@ -86,6 +90,13 @@ fun DTNavHost(
         composable<Screen.TripDetails> {
             val viewModel = hiltViewModel<TripDetailsViewModel>()
             TripDetailsScreen(
+                viewModel = viewModel
+            )
+        }
+
+        composable<Screen.CurrentTrip> {
+            val viewModel = hiltViewModel<CurrentTripViewModel>()
+            CurrentTripScreen(
                 viewModel = viewModel
             )
         }

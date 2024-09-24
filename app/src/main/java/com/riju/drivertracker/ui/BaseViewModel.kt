@@ -18,7 +18,11 @@ open class BaseViewModel<T : Any>(
     val showLoadingDialog = _showLoadingDialog.asStateFlow()
 
     @Suppress("VariableNaming")
-    protected val _errorState = MutableSharedFlow<String>()
+    protected val _snackBarState = MutableSharedFlow<String>(extraBufferCapacity = 1)
+    val snackBarState = _snackBarState.asSharedFlow()
+
+    @Suppress("VariableNaming")
+    protected val _errorState = MutableSharedFlow<String>(extraBufferCapacity = 1)
     val errorState = _errorState.asSharedFlow()
 
     protected fun showLoadingDialog() {
@@ -30,7 +34,11 @@ open class BaseViewModel<T : Any>(
     }
 
     protected fun showError(error: String) {
-        _errorState.tryEmit(error) // TODO: lehet nem lesz jó így
+        _errorState.tryEmit(error)
+    }
+
+    protected fun showSnackBar(message: String) {
+        _snackBarState.tryEmit(message)
     }
 }
 

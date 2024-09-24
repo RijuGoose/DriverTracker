@@ -21,7 +21,7 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
-import com.riju.drivertracker.ui.DTScaffold
+import com.riju.drivertracker.ui.uicomponents.DTScaffold
 
 @Composable
 fun TripDetailsScreen(

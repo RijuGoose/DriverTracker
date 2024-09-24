@@ -1,4 +1,4 @@
-package com.riju.drivertracker.ui
+package com.riju.drivertracker.ui.uicomponents
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -27,6 +27,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.riju.drivertracker.ui.BaseViewModel
+import com.riju.drivertracker.ui.ScreenStatus
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -57,8 +59,16 @@ fun <T : Any> DTScaffold(
         }
     }
 
+    LaunchedEffect(Unit) {
+        viewModel.snackBarState.collectLatest { snackBar ->
+            coroutineScope.launch {
+                snackBarHostState.showSnackbar(snackBar)
+            }
+        }
+    }
+
     Scaffold(
-        modifier = modifier.padding(horizontal = horizontalPadding),
+        modifier,
         topBar = topBar,
         bottomBar = bottomBar,
         floatingActionButton = floatingActionButton,
@@ -73,6 +83,7 @@ fun <T : Any> DTScaffold(
         Box(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(horizontal = horizontalPadding)
                 .padding(it)
         ) {
             when (val status = screenStatus) {

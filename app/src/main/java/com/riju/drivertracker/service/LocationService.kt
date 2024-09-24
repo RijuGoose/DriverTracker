@@ -4,7 +4,6 @@ import android.app.NotificationManager
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.riju.drivertracker.repository.LocationRepository
 import com.riju.drivertracker.repository.TrackingRepository
@@ -14,7 +13,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
@@ -38,23 +36,22 @@ class LocationService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
-            ACTION_START -> start()
-            ACTION_STOP -> stop()
+            ACTION_TRIP_START -> start()
+            ACTION_TRIP_STOP -> stop()
         }
         return super.onStartCommand(intent, flags, startId)
     }
 
     private fun start() {
         val notification = NotificationCompat.Builder(this, "location")
-            .setContentTitle("Location Service")
-            .setContentText("Location updates are coming")
+            .setContentTitle("Tracking")
+            .setContentText("Driver is on the way")
             .setSmallIcon(android.R.drawable.ic_menu_mylocation)
             .setOngoing(true)
 
         val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
 
         locationRepository.getLocationUpdates(LOCATION_UPDATE_DELAY)
-            .catch { e -> e.printStackTrace() }
             .onStart {
                 notificationManager.notify(1, notification.build())
                 trackingRepository.startTracking()
@@ -85,8 +82,8 @@ class LocationService : Service() {
     }
 
     companion object {
-        const val ACTION_START = "ACTION_START"
-        const val ACTION_STOP = "ACTION_STOP"
+        const val ACTION_TRIP_START = "ACTION_TRIP_START"
+        const val ACTION_TRIP_STOP = "ACTION_TRIP_STOP"
         const val LOCATION_UPDATE_DELAY = 2000L
     }
 }

@@ -4,15 +4,27 @@
         android:icon="@drawable/ic_launcher_foreground"
         android:shortcutDisabledMessage="@string/app_shortcut_disabled_message"
         android:shortcutId="shortcut_start_driving"
-        android:shortcutLongLabel="@string/app_shortcut_long_label"
-        android:shortcutShortLabel="@string/app_shortcut_short_label">
+        android:shortcutLongLabel="@string/app_shortcut_start_trip_long_label"
+        android:shortcutShortLabel="@string/app_shortcut_start_trip_short_label">
         <intent
-            android:action="android.intent.action.VIEW"
-            android:targetClass="com.riju.drivertracker.TripManagerActivity"
+            android:action="ACTION_TRIP_START"
+            android:targetClass="com.riju.drivertracker.MainActivity"
             android:targetPackage="com.riju.drivertracker">
-            <extra
-                android:name="tripStatus"
-                android:value="${LocationService.ACTION_START}" />
+        </intent>
+        <capability-binding android:key="actions.intent.OPEN_APP_FEATURE" />
+    </shortcut>
+
+    <shortcut
+        android:enabled="true"
+        android:icon="@drawable/ic_launcher_foreground"
+        android:shortcutDisabledMessage="@string/app_shortcut_disabled_message"
+        android:shortcutId="shortcut_stop_driving"
+        android:shortcutLongLabel="@string/app_shortcut_stop_trip_long_label"
+        android:shortcutShortLabel="@string/app_shortcut_stop_trip_short_label">
+        <intent
+            android:action="ACTION_TRIP_STOP"
+            android:targetClass="com.riju.drivertracker.MainActivity"
+            android:targetPackage="com.riju.drivertracker">
         </intent>
         <capability-binding android:key="actions.intent.OPEN_APP_FEATURE" />
     </shortcut>
