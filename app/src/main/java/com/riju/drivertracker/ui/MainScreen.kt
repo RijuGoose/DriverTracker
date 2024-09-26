@@ -13,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -23,6 +24,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.navigation
 import com.riju.drivertracker.MainViewModel
+import com.riju.drivertracker.R
 import com.riju.drivertracker.ui.currenttrip.CurrentTripScreen
 import com.riju.drivertracker.ui.currenttrip.CurrentTripViewModel
 import com.riju.drivertracker.ui.navigation.Screen
@@ -83,8 +85,12 @@ fun MainScreen(
 @Composable
 private fun DTBottomNavigationBar(navController: NavHostController) {
     val topLevelRoutes = listOf(
-        TopLevelRoute("Trip", Screen.CurrentTrip(), Icons.Outlined.LocationOn),
-        TopLevelRoute("History", Screen.TripHistory, Icons.Outlined.Refresh)
+        TopLevelRoute(
+            stringResource(R.string.navigation_current_trip),
+            Screen.CurrentTrip(),
+            Icons.Outlined.LocationOn
+        ),
+        TopLevelRoute(stringResource(R.string.navigation_trip_history), Screen.TripHistory, Icons.Outlined.Refresh)
     )
 
     NavigationBar {

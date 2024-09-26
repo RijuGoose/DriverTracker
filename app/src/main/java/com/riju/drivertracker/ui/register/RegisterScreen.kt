@@ -9,7 +9,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.riju.drivertracker.R
 import com.riju.drivertracker.ui.uicomponents.DTScaffold
 import kotlinx.coroutines.flow.collectLatest
 
@@ -48,7 +50,7 @@ fun RegisterScreen(
                     viewModel.register(userName, password)
                 }
             ) {
-                Text(text = "Register")
+                Text(text = stringResource(R.string.register_button_register))
             }
         }
     }

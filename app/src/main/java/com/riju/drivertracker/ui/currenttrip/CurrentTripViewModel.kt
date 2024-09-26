@@ -6,6 +6,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.google.android.gms.maps.model.LatLng
+import com.riju.drivertracker.R
 import com.riju.drivertracker.repository.LocationRepository
 import com.riju.drivertracker.repository.TrackingRepository
 import com.riju.drivertracker.repository.UserRepository
@@ -61,7 +62,7 @@ class CurrentTripViewModel @Inject constructor(
                         context.startService(this)
                     }
                 } else {
-                    showSnackBar("Trip is already started")
+                    showSnackBar(context.getString(R.string.current_trip_trip_already_running))
                 }
             }
 
@@ -72,7 +73,9 @@ class CurrentTripViewModel @Inject constructor(
                         context.startService(this)
                     }
                 } else {
-                    _screenStatus.value = ScreenStatus.ErrorFullScreen("Trip is not started")
+                    _screenStatus.value = ScreenStatus.ErrorFullScreen(
+                        error = context.getString(R.string.current_trip_error_no_running_trip)
+                    )
                 }
             }
 
@@ -109,7 +112,7 @@ class CurrentTripViewModel @Inject constructor(
             userRepository.logout()
             _onLogoutSuccess.tryEmit(Unit)
         } catch (e: Exception) {
-            showError(e.message ?: "Unknown error")
+            showError(e.message ?: context.getString(R.string.common_unknown_error))
         } finally {
             hideLoadingDialog()
         }

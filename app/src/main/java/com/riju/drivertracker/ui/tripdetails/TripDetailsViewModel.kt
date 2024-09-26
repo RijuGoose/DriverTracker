@@ -1,5 +1,6 @@
 package com.riju.drivertracker.ui.tripdetails
 
+import android.content.Context
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.luminance
@@ -8,11 +9,13 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
+import com.riju.drivertracker.R
 import com.riju.drivertracker.repository.TripHistoryRepository
 import com.riju.drivertracker.ui.BaseViewModel
 import com.riju.drivertracker.ui.ScreenStatus
 import com.riju.drivertracker.ui.navigation.Screen
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -22,7 +25,8 @@ import javax.inject.Inject
 @HiltViewModel
 class TripDetailsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    tripHistoryRepository: TripHistoryRepository
+    tripHistoryRepository: TripHistoryRepository,
+    @ApplicationContext private val context: Context
 ) : BaseViewModel<TripDetailsUiModel>(defaultScreenState = ScreenStatus.LoadingFullScreen) {
     private val tripId = savedStateHandle.toRoute<Screen.TripDetails>().tripId
     private val _tripPoints = MutableStateFlow<List<Pair<LatLng, Color>>>(emptyList())
@@ -71,10 +75,13 @@ class TripDetailsViewModel @Inject constructor(
                         )
                     )
                 } ?: run {
-                    _screenStatus.value = ScreenStatus.ErrorFullScreen("Trip not found")
+                    _screenStatus.value = ScreenStatus.ErrorFullScreen(
+                        error = context.getString(R.string.trip_details_error_trip_not_found)
+                    )
                 }
             } catch (e: Exception) {
-                _screenStatus.value = ScreenStatus.ErrorFullScreen(e.message ?: "Unknown error")
+                _screenStatus.value =
+                    ScreenStatus.ErrorFullScreen(e.message ?: context.getString(R.string.common_unknown_error))
             }
         }
     }

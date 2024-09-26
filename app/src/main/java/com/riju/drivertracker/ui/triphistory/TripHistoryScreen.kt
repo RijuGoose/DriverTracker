@@ -12,8 +12,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.riju.drivertracker.R
 import com.riju.drivertracker.ui.uicomponents.DTScaffold
 
 @Composable
@@ -24,13 +26,11 @@ fun TripHistoryScreen(
     val tripHistoryList by viewModel.tripHistory.collectAsStateWithLifecycle()
     DTScaffold(
         viewModel = viewModel,
-        topBarTitle = "Trip history"
+        topBarTitle = stringResource(R.string.trip_history_top_bar_title)
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize()
-        ) {
+        Column(modifier = Modifier.fillMaxSize()) {
             if (tripHistoryList.isEmpty()) {
-                Text("No trips found")
+                Text(stringResource(R.string.trip_history_no_trips_found))
             } else {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
@@ -44,7 +44,7 @@ fun TripHistoryScreen(
                                     .clickable { onTripSelected(trip.tripId) }
                             ) {
                                 Text(text = trip.tripName)
-                                Text(text = "Start time:")
+                                Text(text = stringResource(R.string.trip_history_start_time))
                                 Text(text = trip.startTime)
                             }
                         }

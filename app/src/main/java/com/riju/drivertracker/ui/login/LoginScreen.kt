@@ -17,11 +17,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.riju.drivertracker.R
 import com.riju.drivertracker.ui.theme.Typography
 import com.riju.drivertracker.ui.uicomponents.DTOutlinedTextField
 import com.riju.drivertracker.ui.uicomponents.DTScaffold
@@ -51,11 +53,13 @@ fun LoginScreen(
             modifier = modifier.fillMaxSize()
         ) {
             Box(
-                modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Driver Tracker",
+                    text = stringResource(R.string.app_name),
                     style = Typography.headlineLarge,
                     fontWeight = FontWeight.Bold
                 )
@@ -73,7 +77,7 @@ fun LoginScreen(
                         imeAction = ImeAction.Next,
                         keyboardType = KeyboardType.Email
                     ),
-                    label = "Email"
+                    label = stringResource(R.string.login_field_email)
                 )
                 DTOutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
@@ -88,7 +92,7 @@ fun LoginScreen(
                             viewModel.login(userName, password)
                         }
                     ),
-                    label = "Password"
+                    label = stringResource(R.string.login_field_password)
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(
@@ -97,13 +101,13 @@ fun LoginScreen(
                         viewModel.login(userName, password)
                     }
                 ) {
-                    Text(text = "Login")
+                    Text(text = stringResource(R.string.login_button_login))
                 }
                 Button(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = onRegisterClicked
                 ) {
-                    Text(text = "Register")
+                    Text(text = stringResource(R.string.login_button_register))
                 }
             }
         }

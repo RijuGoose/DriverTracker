@@ -11,6 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -20,6 +21,7 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
+import com.riju.drivertracker.R
 import com.riju.drivertracker.ui.uicomponents.DTScaffold
 
 @Composable
@@ -39,7 +41,7 @@ fun TripDetailsScreen(
     DTScaffold(
         viewModel = viewModel,
         horizontalPadding = 0.dp,
-        topBarTitle = "Trip details"
+        topBarTitle = stringResource(R.string.trip_details_top_bar_title)
     ) { uiModel ->
         Column(modifier = Modifier.fillMaxSize()) {
             Column {

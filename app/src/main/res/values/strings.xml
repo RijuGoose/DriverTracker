@@ -1,8 +1,23 @@
 <resources>
-    <string name="app_name">DriverTracker</string>
+    <string name="app_name">Driver Tracker</string>
     <string name="app_shortcut_start_trip_short_label">Start trip</string>
     <string name="app_shortcut_start_trip_long_label">Start the trip to track the driving</string>
     <string name="app_shortcut_stop_trip_short_label">Stop trip</string>
     <string name="app_shortcut_stop_trip_long_label">Stop the current driving trip</string>
     <string name="app_shortcut_disabled_message">Placeholder disabled message</string>
+    <string name="trip_history_top_bar_title">Trip history</string>
+    <string name="trip_history_no_trips_found">No trips found</string>
+    <string name="trip_history_start_time">Start time:</string>
+    <string name="common_unknown_error">Unknown error</string>
+    <string name="current_trip_error_no_running_trip">Trip is not started</string>
+    <string name="current_trip_trip_already_running">Trip is already started</string>
+    <string name="login_field_email">Email</string>
+    <string name="login_field_password">Password</string>
+    <string name="login_button_login">Login</string>
+    <string name="login_button_register">Register</string>
+    <string name="register_button_register">Register</string>
+    <string name="trip_details_top_bar_title">Trip details</string>
+    <string name="trip_details_error_trip_not_found">Trip not found</string>
+    <string name="navigation_current_trip">Trip</string>
+    <string name="navigation_trip_history">History</string>
 </resources>
