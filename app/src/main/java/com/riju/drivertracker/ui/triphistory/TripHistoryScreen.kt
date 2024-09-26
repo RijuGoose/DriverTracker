@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.riju.drivertracker.R
 import com.riju.drivertracker.ui.uicomponents.DTScaffold
+import com.riju.drivertracker.ui.uicomponents.DTTopAppBar
 
 @Composable
 fun TripHistoryScreen(
@@ -26,7 +27,9 @@ fun TripHistoryScreen(
     val tripHistoryList by viewModel.tripHistory.collectAsStateWithLifecycle()
     DTScaffold(
         viewModel = viewModel,
-        topBarTitle = stringResource(R.string.trip_history_top_bar_title)
+        topBar = DTTopAppBar(
+            title = stringResource(R.string.trip_history_top_bar_title)
+        )
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             if (tripHistoryList.isEmpty()) {

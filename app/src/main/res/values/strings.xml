@@ -9,6 +9,7 @@
     <string name="trip_history_no_trips_found">No trips found</string>
     <string name="trip_history_start_time">Start time:</string>
     <string name="common_unknown_error">Unknown error</string>
+    <string name="current_trip_top_bar_title">Current trip</string>
     <string name="current_trip_error_no_running_trip">Trip is not started</string>
     <string name="current_trip_trip_already_running">Trip is already started</string>
     <string name="login_field_email">Email</string>

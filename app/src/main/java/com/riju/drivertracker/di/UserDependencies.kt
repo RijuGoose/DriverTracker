@@ -9,15 +9,18 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 object UserDependencies {
+    @Singleton
     @Provides
     fun provideUserRepositoryImpl(userDataSource: UserDataSource): UserRepository {
         return UserRepositoryImpl(userDataSource)
     }
 
+    @Singleton
     @Provides
     fun provideUserDataSourceImpl(firebaseAuth: FirebaseAuth): UserDataSource {
         return UserDataSourceImpl(firebaseAuth)

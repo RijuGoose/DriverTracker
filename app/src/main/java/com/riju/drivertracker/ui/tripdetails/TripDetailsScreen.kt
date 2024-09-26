@@ -23,10 +23,12 @@ import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.riju.drivertracker.R
 import com.riju.drivertracker.ui.uicomponents.DTScaffold
+import com.riju.drivertracker.ui.uicomponents.DTTopAppBar
 
 @Composable
 fun TripDetailsScreen(
-    viewModel: TripDetailsViewModel
+    viewModel: TripDetailsViewModel,
+    onBackPressed: (() -> Unit)?
 ) {
     val tripPoints by viewModel.tripPoints.collectAsStateWithLifecycle()
     val mapBounds by viewModel.mapBounds.collectAsStateWithLifecycle()
@@ -41,7 +43,10 @@ fun TripDetailsScreen(
     DTScaffold(
         viewModel = viewModel,
         horizontalPadding = 0.dp,
-        topBarTitle = stringResource(R.string.trip_details_top_bar_title)
+        topBar = DTTopAppBar(
+            title = stringResource(R.string.trip_details_top_bar_title),
+            onBackButtonClicked = onBackPressed
+        )
     ) { uiModel ->
         Column(modifier = Modifier.fillMaxSize()) {
             Column {

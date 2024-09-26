@@ -26,6 +26,7 @@ object TrackingDependencies {
         return TrackingRepositoryImpl(trackingDataSource, userDataSource)
     }
 
+    @Singleton
     @Provides
     fun provideTrackingHistoryRepositoryImpl(
         trackingDataSource: TrackingDataSource,
@@ -34,6 +35,7 @@ object TrackingDependencies {
         return TripHistoryRepositoryImpl(trackingDataSource, userDataSource)
     }
 
+    @Singleton
     @Provides
     fun provideTrackingDataSourceImpl(database: DatabaseReference): TrackingDataSource {
         return TrackingDataSourceImpl(database)

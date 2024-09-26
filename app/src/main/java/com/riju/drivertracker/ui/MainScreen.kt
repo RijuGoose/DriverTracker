@@ -53,7 +53,16 @@ fun MainScreen(
                 .padding(bottom = innerPadding.calculateBottomPadding())
         ) {
             navigation<Screen.Main>(startDestination = mainViewModel.mainStartScreen) {
-                composable<Screen.TripHistory> {
+                composable<Screen.CurrentTrip> {
+                    val viewModel = hiltViewModel<CurrentTripViewModel>()
+                    CurrentTripScreen(
+                        viewModel = viewModel,
+                        onLogout = onLogout,
+                    )
+                }
+            }
+            navigation<Screen.TripHistory>(startDestination = Screen.TripList) {
+                composable<Screen.TripList> {
                     val viewModel = hiltViewModel<TripHistoryViewModel>()
                     TripHistoryScreen(
                         viewModel = viewModel,
@@ -66,15 +75,8 @@ fun MainScreen(
                 composable<Screen.TripDetails> {
                     val viewModel = hiltViewModel<TripDetailsViewModel>()
                     TripDetailsScreen(
-                        viewModel = viewModel
-                    )
-                }
-
-                composable<Screen.CurrentTrip> {
-                    val viewModel = hiltViewModel<CurrentTripViewModel>()
-                    CurrentTripScreen(
                         viewModel = viewModel,
-                        onLogout = onLogout,
+                        onBackPressed = { mainNavHostController.navigateUp() }
                     )
                 }
             }
@@ -90,7 +92,11 @@ private fun DTBottomNavigationBar(navController: NavHostController) {
             Screen.CurrentTrip(),
             Icons.Outlined.LocationOn
         ),
-        TopLevelRoute(stringResource(R.string.navigation_trip_history), Screen.TripHistory, Icons.Outlined.Refresh)
+        TopLevelRoute(
+            stringResource(R.string.navigation_trip_history),
+            Screen.TripHistory,
+            Icons.Outlined.Refresh
+        )
     )
 
     NavigationBar {

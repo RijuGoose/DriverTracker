@@ -5,10 +5,14 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
@@ -40,7 +44,7 @@ fun <T : Any> DTScaffold(
     viewModel: BaseViewModel<T>,
     modifier: Modifier = Modifier,
     horizontalPadding: Dp = 8.dp,
-    topBarTitle: String? = null,
+    topBar: DTTopAppBar? = null,
     floatingActionButton: @Composable () -> Unit = {},
     floatingActionButtonPosition: FabPosition = FabPosition.End,
     containerColor: Color = MaterialTheme.colorScheme.background,
@@ -72,10 +76,21 @@ fun <T : Any> DTScaffold(
     Scaffold(
         modifier = modifier,
         topBar = {
-            if (topBarTitle != null) {
+            if (topBar != null) {
                 TopAppBar(
                     title = {
-                        Text(topBarTitle)
+                        Text(topBar.title)
+                    },
+                    navigationIcon = {
+                        if (topBar.onBackButtonClicked != null) {
+                            IconButton(
+                                onClick = {
+                                    topBar.onBackButtonClicked.invoke()
+                                }
+                            ) {
+                                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                            }
+                        }
                     }
                 )
             }

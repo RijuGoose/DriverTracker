@@ -19,6 +19,9 @@ sealed class Screen {
     data object TripHistory : Screen()
 
     @Serializable
+    data object TripList : Screen()
+
+    @Serializable
     data class TripDetails(val tripId: String) : Screen()
 
     @Serializable
