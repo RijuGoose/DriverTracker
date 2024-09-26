@@ -37,8 +37,6 @@ class TrackingDataSourceImpl(
             .child(pointCount.toString())
             // .push()
             .setValue(routePoint)
-
-        database.child("users").removeValue()
     }
 
     override suspend fun getAllTripHistory(user: FirebaseUser, orderBy: String): Map<String, TripDetailsResponse>? {
