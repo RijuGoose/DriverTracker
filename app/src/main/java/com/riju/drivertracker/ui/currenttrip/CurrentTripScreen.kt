@@ -27,14 +27,12 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import com.riju.drivertracker.R
 import com.riju.drivertracker.ui.uicomponents.DTScaffold
 import com.riju.drivertracker.ui.uicomponents.DTTopAppBar
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun CurrentTripScreen(
-    viewModel: CurrentTripViewModel,
-    onLogout: () -> Unit,
+    viewModel: CurrentTripViewModel
 ) {
     val cameraPositionState = rememberCameraPositionState()
     val coroutineScope = rememberCoroutineScope()
@@ -70,12 +68,6 @@ fun CurrentTripScreen(
         }
     }
 
-    LaunchedEffect(Unit) {
-        viewModel.onLogoutSuccess.collectLatest {
-            onLogout()
-        }
-    }
-
     DTScaffold(
         viewModel = viewModel,
         horizontalPadding = 0.dp,
@@ -97,9 +89,6 @@ fun CurrentTripScreen(
                 ) {
                     Text(text = "Stop")
                 }
-            }
-            Button(onClick = viewModel::logout) {
-                Text(text = "Logout")
             }
             if (locationPermissionState.allPermissionsGranted) {
                 GoogleMap(

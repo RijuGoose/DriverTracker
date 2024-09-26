@@ -26,6 +26,12 @@ sealed class Screen {
 
     @Serializable
     data class CurrentTrip(val action: CurrentTripAction = CurrentTripAction.None) : Screen()
+
+    @Serializable
+    data object Menu : Screen()
+
+    @Serializable
+    data object MainMenu : Screen()
 }
 
 enum class CurrentTripAction {

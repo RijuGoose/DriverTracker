@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -27,6 +28,8 @@ import com.riju.drivertracker.MainViewModel
 import com.riju.drivertracker.R
 import com.riju.drivertracker.ui.currenttrip.CurrentTripScreen
 import com.riju.drivertracker.ui.currenttrip.CurrentTripViewModel
+import com.riju.drivertracker.ui.mainmenu.MainMenuScreen
+import com.riju.drivertracker.ui.mainmenu.MainMenuViewModel
 import com.riju.drivertracker.ui.navigation.Screen
 import com.riju.drivertracker.ui.navigation.TopLevelRoute
 import com.riju.drivertracker.ui.tripdetails.TripDetailsScreen
@@ -57,7 +60,6 @@ fun MainScreen(
                     val viewModel = hiltViewModel<CurrentTripViewModel>()
                     CurrentTripScreen(
                         viewModel = viewModel,
-                        onLogout = onLogout,
                     )
                 }
             }
@@ -80,6 +82,16 @@ fun MainScreen(
                     )
                 }
             }
+
+            navigation<Screen.Menu>(startDestination = Screen.MainMenu) {
+                composable<Screen.MainMenu> {
+                    val viewModel = hiltViewModel<MainMenuViewModel>()
+                    MainMenuScreen(
+                        viewModel = viewModel,
+                        onLogout = onLogout,
+                    )
+                }
+            }
         }
     }
 }
@@ -96,6 +108,11 @@ private fun DTBottomNavigationBar(navController: NavHostController) {
             stringResource(R.string.navigation_trip_history),
             Screen.TripHistory,
             Icons.Outlined.Refresh
+        ),
+        TopLevelRoute(
+            stringResource(R.string.navigation_main_menu),
+            Screen.MainMenu,
+            Icons.Outlined.Menu
         )
     )
 

@@ -9,7 +9,6 @@ import com.google.android.gms.maps.model.LatLng
 import com.riju.drivertracker.R
 import com.riju.drivertracker.repository.LocationRepository
 import com.riju.drivertracker.repository.TrackingRepository
-import com.riju.drivertracker.repository.UserRepository
 import com.riju.drivertracker.service.LocationService
 import com.riju.drivertracker.ui.BaseViewModel
 import com.riju.drivertracker.ui.ScreenStatus
@@ -17,9 +16,7 @@ import com.riju.drivertracker.ui.navigation.CurrentTripAction
 import com.riju.drivertracker.ui.navigation.Screen
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
@@ -29,8 +26,7 @@ class CurrentTripViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     @ApplicationContext private val context: Context,
     trackingRepository: TrackingRepository,
-    locationRepository: LocationRepository,
-    private val userRepository: UserRepository,
+    locationRepository: LocationRepository
 ) : BaseViewModel<Unit>(ScreenStatus.Success(Unit)) {
     val currentTripRoute = trackingRepository.getCurrentTripFlow().map { trackingPoints ->
         trackingPoints?.map {
@@ -85,9 +81,6 @@ class CurrentTripViewModel @Inject constructor(
         }
     }
 
-    private val _onLogoutSuccess = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
-    val onLogoutSuccess = _onLogoutSuccess.asSharedFlow()
-
     fun startLocationService() {
         showLoadingDialog()
         Intent(context, LocationService::class.java).apply {
@@ -104,18 +97,6 @@ class CurrentTripViewModel @Inject constructor(
             context.startService(this)
         }
         hideLoadingDialog()
-    }
-
-    fun logout() {
-        showLoadingDialog()
-        try {
-            userRepository.logout()
-            _onLogoutSuccess.tryEmit(Unit)
-        } catch (e: Exception) {
-            showError(e.message ?: context.getString(R.string.common_unknown_error))
-        } finally {
-            hideLoadingDialog()
-        }
     }
 
     companion object {
