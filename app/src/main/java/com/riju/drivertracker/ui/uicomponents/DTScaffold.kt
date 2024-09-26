@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -14,6 +15,7 @@ import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -32,13 +34,13 @@ import com.riju.drivertracker.ui.ScreenStatus
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun <T : Any> DTScaffold(
     viewModel: BaseViewModel<T>,
     modifier: Modifier = Modifier,
     horizontalPadding: Dp = 8.dp,
-    topBar: @Composable () -> Unit = {},
-    bottomBar: @Composable () -> Unit = {},
+    topBarTitle: String? = null,
     floatingActionButton: @Composable () -> Unit = {},
     floatingActionButtonPosition: FabPosition = FabPosition.End,
     containerColor: Color = MaterialTheme.colorScheme.background,
@@ -68,9 +70,16 @@ fun <T : Any> DTScaffold(
     }
 
     Scaffold(
-        modifier,
-        topBar = topBar,
-        bottomBar = bottomBar,
+        modifier = modifier,
+        topBar = {
+            if (topBarTitle != null) {
+                TopAppBar(
+                    title = {
+                        Text(topBarTitle)
+                    }
+                )
+            }
+        },
         floatingActionButton = floatingActionButton,
         floatingActionButtonPosition = floatingActionButtonPosition,
         snackbarHost = {
@@ -82,9 +91,9 @@ fun <T : Any> DTScaffold(
     ) {
         Box(
             modifier = Modifier
-                .fillMaxSize()
                 .padding(horizontal = horizontalPadding)
-                .padding(it)
+                .padding(top = it.calculateTopPadding())
+                .fillMaxSize()
         ) {
             when (val status = screenStatus) {
                 is ScreenStatus.LoadingFullScreen -> {

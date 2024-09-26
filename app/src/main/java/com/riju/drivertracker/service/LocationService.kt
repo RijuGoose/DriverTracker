@@ -57,6 +57,7 @@ class LocationService : Service() {
                 trackingRepository.startTracking()
             }
             .onEach { location ->
+                // TODO try catch
                 trackingRepository.addRoutePoint(
                     TrackingPoint(
                         lat = location.latitude,

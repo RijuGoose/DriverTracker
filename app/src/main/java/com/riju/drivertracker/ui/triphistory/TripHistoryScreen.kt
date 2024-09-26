@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,30 +22,31 @@ fun TripHistoryScreen(
     onTripSelected: (String) -> Unit
 ) {
     val tripHistoryList by viewModel.tripHistory.collectAsStateWithLifecycle()
-    DTScaffold(viewModel = viewModel) {
+    DTScaffold(
+        viewModel = viewModel,
+        topBarTitle = "Trip history"
+    ) {
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            Button(onClick = viewModel::getTripHistoryByTripName) {
-                Text("Order by trip name")
-            }
-            Button(onClick = viewModel::getTripHistoryByStartTime) {
-                Text("Order by start time")
-            }
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                items(tripHistoryList) { trip ->
-                    Card {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { onTripSelected(trip.tripId) }
-                        ) {
-                            Text(text = trip.tripName)
-                            Text(text = "Start time:")
-                            Text(text = trip.startTime)
+            if (tripHistoryList.isEmpty()) {
+                Text("No trips found")
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    items(tripHistoryList) { trip ->
+                        Card {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable { onTripSelected(trip.tripId) }
+                            ) {
+                                Text(text = trip.tripName)
+                                Text(text = "Start time:")
+                                Text(text = trip.startTime)
+                            }
                         }
                     }
                 }

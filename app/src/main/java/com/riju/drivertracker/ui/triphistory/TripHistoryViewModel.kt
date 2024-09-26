@@ -17,29 +17,13 @@ class TripHistoryViewModel @Inject constructor(
     private val tripHistoryRepository: TripHistoryRepository
 ) : BaseViewModel<Unit>() {
     private val _tripHistory: MutableStateFlow<List<TripDetails>> = MutableStateFlow(emptyList())
-
     val tripHistory = _tripHistory.asStateFlow()
 
     init {
         getTripHistoryByStartTime()
     }
 
-    fun getTripHistoryByTripName() {
-        viewModelScope.launch {
-            _screenStatus.value = ScreenStatus.LoadingFullScreen
-            try {
-                _tripHistory.value =
-                    tripHistoryRepository.getAllTripHistory(DatabaseConstants.FIELD_TRIP_NAME) ?: emptyList()
-                _screenStatus.value = ScreenStatus.Success(Unit)
-            } catch (e: Exception) {
-                _screenStatus.value = ScreenStatus.ErrorFullScreen(
-                    error = e.message ?: "Unknown error"
-                )
-            }
-        }
-    }
-
-    fun getTripHistoryByStartTime() {
+    private fun getTripHistoryByStartTime() {
         viewModelScope.launch {
             _screenStatus.value = ScreenStatus.LoadingFullScreen
             try {

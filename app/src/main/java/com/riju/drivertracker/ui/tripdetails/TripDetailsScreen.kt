@@ -3,7 +3,6 @@ package com.riju.drivertracker.ui.tripdetails
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -39,10 +38,11 @@ fun TripDetailsScreen(
 
     DTScaffold(
         viewModel = viewModel,
-        horizontalPadding = 0.dp
+        horizontalPadding = 0.dp,
+        topBarTitle = "Trip details"
     ) { uiModel ->
         Column(modifier = Modifier.fillMaxSize()) {
-            Column(modifier = Modifier.padding(16.dp)) {
+            Column {
                 Text("Avg speed: ${uiModel.avgSpeed}")
                 Text("Max speed: ${uiModel.maxSpeed}")
                 Text("Distance: ${uiModel.distance}")

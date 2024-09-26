@@ -8,6 +8,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.navigation.compose.rememberNavController
+import com.riju.drivertracker.ui.navigation.DTNavHost
 import com.riju.drivertracker.ui.theme.DriverTrackerTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -23,9 +25,12 @@ class MainActivity : ComponentActivity() {
 
         enableEdgeToEdge()
         setContent {
+            val navHostController = rememberNavController()
+
             DriverTrackerTheme {
                 DTNavHost(
-                    mainViewModel = mainViewModel
+                    mainViewModel = mainViewModel,
+                    navHostController = navHostController,
                 )
             }
         }

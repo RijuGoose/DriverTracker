@@ -1,8 +1,11 @@
-package com.riju.drivertracker.ui
+package com.riju.drivertracker.ui.navigation
 
 import kotlinx.serialization.Serializable
 
 sealed class Screen {
+    @Serializable
+    data object Auth : Screen()
+
     @Serializable
     data object Login : Screen()
 
@@ -10,7 +13,7 @@ sealed class Screen {
     data object Register : Screen()
 
     @Serializable
-    data object Map : Screen()
+    data object Main : Screen()
 
     @Serializable
     data object TripHistory : Screen()
@@ -19,7 +22,7 @@ sealed class Screen {
     data class TripDetails(val tripId: String) : Screen()
 
     @Serializable
-    data class CurrentTrip(val action: CurrentTripAction) : Screen()
+    data class CurrentTrip(val action: CurrentTripAction = CurrentTripAction.None) : Screen()
 }
 
 enum class CurrentTripAction {
