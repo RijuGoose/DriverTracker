@@ -14,7 +14,6 @@ class TripHistoryRepositoryImpl(
             trackingDataSource.getAllTripHistory(currentUser, orderBy)?.map { tripDetails ->
                 TripDetails(
                     tripId = tripDetails.key,
-                    tripName = tripDetails.value.tripName,
                     startTime = tripDetails.value.startTime,
                     endTime = tripDetails.value.endTime,
                     startLocation = tripDetails.value.startLocation,
@@ -41,7 +40,6 @@ class TripHistoryRepositoryImpl(
             trackingDataSource.getTripDetails(currentUser, tripId).let { tripDetails ->
                 TripDetails(
                     tripId = tripId,
-                    tripName = requireNotNull(tripDetails?.tripName),
                     startTime = requireNotNull(tripDetails?.startTime),
                     endTime = tripDetails?.endTime,
                     startLocation = requireNotNull(tripDetails?.startLocation),

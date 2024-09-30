@@ -28,6 +28,16 @@ class TrackingDataSourceImpl(
             .setValue(tripDetails)
     }
 
+    override fun modifyEndTime(user: FirebaseUser, tripId: String, endTime: String) {
+        database
+            .child(DatabaseConstants.LIST_USERS)
+            .child(user.uid)
+            .child(DatabaseConstants.LIST_TRIPS)
+            .child(tripId)
+            .child(DatabaseConstants.FIELD_END_TIME)
+            .setValue(endTime)
+    }
+
     override fun addRoutePoint(user: FirebaseUser, tripId: String, pointCount: Int, routePoint: RoutePointRequest) {
         database
             .child(DatabaseConstants.LIST_USERS)
@@ -35,7 +45,6 @@ class TrackingDataSourceImpl(
             .child(DatabaseConstants.LIST_TRIP_LOCATIONS)
             .child(tripId)
             .child(pointCount.toString())
-            // .push()
             .setValue(routePoint)
     }
 

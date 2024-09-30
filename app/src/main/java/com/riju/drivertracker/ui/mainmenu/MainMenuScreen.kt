@@ -7,6 +7,7 @@ import androidx.compose.ui.res.stringResource
 import com.riju.drivertracker.R
 import com.riju.drivertracker.ui.mainmenu.components.MainMenuButton
 import com.riju.drivertracker.ui.uicomponents.DTScaffold
+import com.riju.drivertracker.ui.uicomponents.DTTopAppBar
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -20,7 +21,10 @@ fun MainMenuScreen(
         }
     }
 
-    DTScaffold(viewModel = viewModel) {
+    DTScaffold(
+        viewModel = viewModel,
+        topBar = DTTopAppBar(title = "Main menu")
+    ) {
         Column {
             MainMenuButton(title = stringResource(R.string.main_menu_button_logout), onClick = viewModel::logout)
         }

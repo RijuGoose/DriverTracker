@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import java.util.UUID
 
 class TrackingRepositoryImpl(
@@ -30,8 +29,7 @@ class TrackingRepositoryImpl(
                 user = currentUser,
                 tripId = requireNotNull(currentTripId.value),
                 tripDetails = TripDetailsRequest(
-                    tripName = "TripName ChangeMe",
-                    startTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")),
+                    startTime = LocalDateTime.now().toString(),
                     startLocation = "Start Location",
                 )
             )
@@ -72,8 +70,15 @@ class TrackingRepositoryImpl(
     }
 
     override fun stopTracking() {
-        currentTripId.value = null
         currentTripCounter = 0
+        userDataSource.getUser()?.let { currentUser ->
+            trackingDataSource.modifyEndTime(
+                user = currentUser,
+                tripId = requireNotNull(currentTripId.value),
+                endTime = LocalDateTime.now().toString()
+            )
+        }
+        currentTripId.value = null
     }
 
     override fun isTracking(): Boolean {

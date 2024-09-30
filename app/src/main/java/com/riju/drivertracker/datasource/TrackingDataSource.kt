@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface TrackingDataSource {
     fun addTripDetails(user: FirebaseUser, tripId: String, tripDetails: TripDetailsRequest)
+    fun modifyEndTime(user: FirebaseUser, tripId: String, endTime: String)
     fun addRoutePoint(user: FirebaseUser, tripId: String, pointCount: Int, routePoint: RoutePointRequest)
     suspend fun getAllTripHistory(user: FirebaseUser, orderBy: String): Map<String, TripDetailsResponse>?
     suspend fun getTripHistoryRouteById(user: FirebaseUser, tripId: String): List<RoutePointResponse>?

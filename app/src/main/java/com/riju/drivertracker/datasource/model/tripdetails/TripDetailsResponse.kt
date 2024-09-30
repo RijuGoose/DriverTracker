@@ -1,7 +1,6 @@
 package com.riju.drivertracker.datasource.model.tripdetails
 
 data class TripDetailsResponse(
-    override val tripName: String = "",
     override val startTime: String = "",
     override val endTime: String? = null,
     override val startLocation: String = "",
