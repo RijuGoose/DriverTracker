@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.StrokeStyle
 import com.google.android.gms.maps.model.StyleSpan
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapUiSettings
@@ -78,8 +79,14 @@ fun TripDetailsScreen(
                         Polyline(
                             points = tripPoints.map { it.first },
                             clickable = true,
-                            spans = tripPoints.map {
-                                StyleSpan(it.second.toArgb())
+                            spans = List(tripPoints.size) { index ->
+                                val nextIndex = if (index == tripPoints.size - 1) index else index + 1
+                                StyleSpan(
+                                    StrokeStyle.gradientBuilder(
+                                        tripPoints[index].second.toArgb(),
+                                        tripPoints[nextIndex].second.toArgb()
+                                    ).build()
+                                )
                             }
                         )
                     }
