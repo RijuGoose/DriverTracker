@@ -2,10 +2,14 @@ package com.riju.drivertracker.ui.currenttrip
 
 import android.Manifest
 import android.os.Build
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,7 +41,6 @@ fun CurrentTripScreen(
     val cameraPositionState = rememberCameraPositionState()
     val coroutineScope = rememberCoroutineScope()
     val currentTripRoute by viewModel.currentTripRoute.collectAsStateWithLifecycle()
-    val currentLocation by viewModel.currentLocation.collectAsStateWithLifecycle()
 
     val allPermissions = rememberMultiplePermissionsState(
         permissions =
@@ -76,16 +79,31 @@ fun CurrentTripScreen(
         )
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
-            Row {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
                 Button(
+                    modifier = Modifier.weight(1f),
                     onClick = viewModel::startLocationService,
-                    enabled = locationPermissionState.allPermissionsGranted
+                    enabled = locationPermissionState.allPermissionsGranted && currentTripRoute.isEmpty(),
+                    colors = ButtonDefaults.buttonColors().copy(
+                        containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onTertiaryContainer
+                    )
                 ) {
                     Text(text = "Start")
                 }
                 Button(
+                    modifier = Modifier.weight(1f),
                     onClick = viewModel::stopLocationService,
-                    enabled = locationPermissionState.allPermissionsGranted
+                    enabled = locationPermissionState.allPermissionsGranted && currentTripRoute.isNotEmpty(),
+                    colors = ButtonDefaults.buttonColors().copy(
+                        containerColor = MaterialTheme.colorScheme.error,
+                        contentColor = MaterialTheme.colorScheme.onError
+                    )
                 ) {
                     Text(text = "Stop")
                 }
@@ -94,8 +112,9 @@ fun CurrentTripScreen(
                 GoogleMap(
                     cameraPositionState = cameraPositionState,
                     onMapLoaded = {
-                        currentLocation?.let {
-                            coroutineScope.launch {
+                        coroutineScope.launch {
+                            val currentLocation = viewModel.getCurrentLocation()
+                            currentLocation?.let {
                                 cameraPositionState.animate(
                                     update = CameraUpdateFactory.newLatLngZoom(it, CurrentTripViewModel.ZOOM_LEVEL)
                                 )

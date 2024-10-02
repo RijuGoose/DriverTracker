@@ -26,7 +26,7 @@ class CurrentTripViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     @ApplicationContext private val context: Context,
     trackingRepository: TrackingRepository,
-    locationRepository: LocationRepository
+    private val locationRepository: LocationRepository
 ) : BaseViewModel<Unit>(ScreenStatus.Success(Unit)) {
     val currentTripRoute = trackingRepository.getCurrentTripFlow().map { trackingPoints ->
         trackingPoints?.map {
@@ -37,16 +37,6 @@ class CurrentTripViewModel @Inject constructor(
         started = SharingStarted.WhileSubscribed(),
         initialValue = emptyList()
     )
-
-    val currentLocation = locationRepository.getLocationUpdates(5000L)
-        .map { location ->
-            LatLng(location.latitude, location.longitude)
-        }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = null
-        )
 
     init {
         val action = savedStateHandle.toRoute<Screen.CurrentTrip>().action
@@ -97,6 +87,12 @@ class CurrentTripViewModel @Inject constructor(
             context.startService(this)
         }
         hideLoadingDialog()
+    }
+
+    suspend fun getCurrentLocation(): LatLng? {
+        return locationRepository.getCurrentLocation()?.let {
+            LatLng(it.latitude, it.longitude)
+        }
     }
 
     companion object {

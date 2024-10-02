@@ -11,10 +11,15 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.Priority
+import com.google.android.gms.tasks.CancellationToken
+import com.google.android.gms.tasks.CancellationTokenSource
+import com.google.android.gms.tasks.OnTokenCanceledListener
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class LocationRepositoryImpl(
     private val context: Context,
@@ -64,5 +69,37 @@ class LocationRepositoryImpl(
                 client.removeLocationUpdates(locationCallback)
             }
         }
+    }
+
+    override suspend fun getCurrentLocation(): Location? {
+        if (ActivityCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            // TODO if permission is not granted, emit error
+        }
+
+        val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+        val isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+        if (!isGpsEnabled && !isNetworkEnabled) {
+            // TODO emit error
+        }
+
+        val cancellationToken = object : CancellationToken() {
+            override fun onCanceledRequested(p0: OnTokenCanceledListener): CancellationToken {
+                return CancellationTokenSource().token
+            }
+
+            override fun isCancellationRequested(): Boolean {
+                return false
+            }
+        }
+
+        return client.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, cancellationToken).await()
     }
 }
