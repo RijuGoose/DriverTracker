@@ -1,13 +1,16 @@
 package com.riju.drivertracker.ui.tripdetails
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
@@ -23,9 +26,13 @@ import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.riju.drivertracker.R
+import com.riju.drivertracker.extensions.toLocalDateString
+import com.riju.drivertracker.extensions.toTimeString
+import com.riju.drivertracker.ui.tripdetails.components.TripDetailCard
 import com.riju.drivertracker.ui.uicomponents.DTScaffold
 import com.riju.drivertracker.ui.uicomponents.DTTopAppBar
 
+@Suppress("MagicNumber")
 @Composable
 fun TripDetailsScreen(
     viewModel: TripDetailsViewModel,
@@ -39,8 +46,6 @@ fun TripDetailsScreen(
         position = CameraPosition.fromLatLngZoom(mapBounds.center, 10f) // TODO ezt amúgy máshogy kéne
     }
 
-    var isMapLoaded by remember { mutableStateOf(false) }
-
     DTScaffold(
         viewModel = viewModel,
         horizontalPadding = 0.dp,
@@ -50,16 +55,7 @@ fun TripDetailsScreen(
         )
     ) { uiModel ->
         Column(modifier = Modifier.fillMaxSize()) {
-            Column {
-                Text("Avg speed: ${uiModel.avgSpeed}")
-                Text("Max speed: ${uiModel.maxSpeed}")
-                Text("Distance: ${uiModel.distance}")
-                Text("Start time: ${uiModel.startTime}")
-                Text("End time: ${uiModel.endTime}")
-                Text("Start location: ${uiModel.startLocation}")
-                Text("End location: ${uiModel.endLocation}")
-            }
-            Box(modifier = Modifier.fillMaxSize()) {
+            Box(modifier = Modifier.weight(0.5f)) {
                 GoogleMap(
                     cameraPositionState = cameraPositionState,
                     onMapLoaded = {
@@ -69,7 +65,6 @@ fun TripDetailsScreen(
                                 TripDetailsViewModel.CAMERA_PADDING
                             )
                         )
-                        isMapLoaded = true
                     },
                     uiSettings = MapUiSettings(
                         tiltGesturesEnabled = false
@@ -90,6 +85,66 @@ fun TripDetailsScreen(
                             }
                         )
                     }
+                }
+            }
+            Column(
+                modifier = Modifier
+                    .weight(0.5f)
+                    .verticalScroll(rememberScrollState())
+                    .padding(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    TripDetailCard(
+                        modifier = Modifier.weight(1f),
+                        cardTitle = stringResource(R.string.trip_details_avg_speed),
+                        cardValue = uiModel.avgSpeed.toString()
+                    )
+                    TripDetailCard(
+                        modifier = Modifier.weight(1f),
+                        cardTitle = stringResource(R.string.trip_details_max_speed),
+                        cardValue = uiModel.maxSpeed.toString()
+                    )
+                }
+                TripDetailCard(
+                    modifier = Modifier.fillMaxWidth(),
+                    cardTitle = stringResource(R.string.trip_details_distance),
+                    cardValue = uiModel.distance.toString()
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    TripDetailCard(
+                        modifier = Modifier.weight(1f),
+                        cardTitle = stringResource(R.string.trip_details_start_time),
+                        cardValue = uiModel.startTime.toLocalDateString() + "\n" + uiModel.startTime.toTimeString()
+                    )
+                    TripDetailCard(
+                        modifier = Modifier.weight(1f),
+                        cardTitle = stringResource(R.string.trip_details_end_time),
+                        cardValue = uiModel.endTime?.let {
+                            it.toLocalDateString() + "\n" + it.toTimeString()
+                        } ?: "-"
+                    )
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    TripDetailCard(
+                        modifier = Modifier.weight(1f),
+                        cardTitle = stringResource(R.string.trip_details_start_location),
+                        cardValue = uiModel.startLocation
+                    )
+                    TripDetailCard(
+                        modifier = Modifier.weight(1f),
+                        cardTitle = stringResource(R.string.trip_details_end_location),
+                        cardValue = uiModel.endLocation ?: "-"
+                    )
                 }
             }
         }

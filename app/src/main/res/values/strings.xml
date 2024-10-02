@@ -23,4 +23,11 @@
     <string name="navigation_trip_history">History</string>
     <string name="navigation_main_menu">Menu</string>
     <string name="main_menu_button_logout">Logout</string>
+    <string name="trip_details_avg_speed">Avg speed</string>
+    <string name="trip_details_max_speed">Max speed</string>
+    <string name="trip_details_distance">Distance</string>
+    <string name="trip_details_start_time">Start time</string>
+    <string name="trip_details_end_time">End time</string>
+    <string name="trip_details_start_location">Start location</string>
+    <string name="trip_details_end_location">End location</string>
 </resources>

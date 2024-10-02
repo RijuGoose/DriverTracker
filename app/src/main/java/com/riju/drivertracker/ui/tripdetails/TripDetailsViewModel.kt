@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.math.RoundingMode
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 @HiltViewModel
@@ -68,8 +69,8 @@ class TripDetailsViewModel @Inject constructor(
                                 .toDouble(), // TODO extension erre
                             maxSpeed = maxSpeed,
                             distance = 0.0, // TODO how to get it
-                            startTime = tripDetails?.startTime ?: "-",
-                            endTime = tripDetails?.endTime ?: "-",
+                            startTime = LocalDateTime.parse(tripDetails?.startTime),
+                            endTime = tripDetails?.endTime?.let { endTime -> LocalDateTime.parse(endTime) },
                             startLocation = tripDetails?.startLocation ?: "-",
                             endLocation = tripDetails?.endLocation ?: "-"
                         )
