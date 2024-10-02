@@ -38,6 +38,12 @@ class CurrentTripViewModel @Inject constructor(
         initialValue = emptyList()
     )
 
+    val isTracking = trackingRepository.isTracking.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(),
+        initialValue = false
+    )
+
     init {
         val action = savedStateHandle.toRoute<Screen.CurrentTrip>().action
         when (action) {

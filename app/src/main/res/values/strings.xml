@@ -30,4 +30,6 @@
     <string name="trip_details_end_time">End time</string>
     <string name="trip_details_start_location">Start location</string>
     <string name="trip_details_end_location">End location</string>
+    <string name="current_trip_button_start">Start</string>
+    <string name="current_trip_button_stop">Stop</string>
 </resources>

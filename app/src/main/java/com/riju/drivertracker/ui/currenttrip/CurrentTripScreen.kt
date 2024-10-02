@@ -41,6 +41,7 @@ fun CurrentTripScreen(
     val cameraPositionState = rememberCameraPositionState()
     val coroutineScope = rememberCoroutineScope()
     val currentTripRoute by viewModel.currentTripRoute.collectAsStateWithLifecycle()
+    val isTracking by viewModel.isTracking.collectAsStateWithLifecycle()
 
     val allPermissions = rememberMultiplePermissionsState(
         permissions =
@@ -88,24 +89,24 @@ fun CurrentTripScreen(
                 Button(
                     modifier = Modifier.weight(1f),
                     onClick = viewModel::startLocationService,
-                    enabled = locationPermissionState.allPermissionsGranted && currentTripRoute.isEmpty(),
+                    enabled = locationPermissionState.allPermissionsGranted && !isTracking,
                     colors = ButtonDefaults.buttonColors().copy(
                         containerColor = MaterialTheme.colorScheme.tertiaryContainer,
                         contentColor = MaterialTheme.colorScheme.onTertiaryContainer
                     )
                 ) {
-                    Text(text = "Start")
+                    Text(text = stringResource(R.string.current_trip_button_start))
                 }
                 Button(
                     modifier = Modifier.weight(1f),
                     onClick = viewModel::stopLocationService,
-                    enabled = locationPermissionState.allPermissionsGranted && currentTripRoute.isNotEmpty(),
+                    enabled = locationPermissionState.allPermissionsGranted && isTracking,
                     colors = ButtonDefaults.buttonColors().copy(
                         containerColor = MaterialTheme.colorScheme.error,
                         contentColor = MaterialTheme.colorScheme.onError
                     )
                 ) {
-                    Text(text = "Stop")
+                    Text(text = stringResource(R.string.current_trip_button_stop))
                 }
             }
             if (locationPermissionState.allPermissionsGranted) {

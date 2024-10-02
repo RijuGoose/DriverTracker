@@ -21,6 +21,8 @@ class TrackingRepositoryImpl(
     private val currentTripId: MutableStateFlow<String?> = MutableStateFlow(null)
     private var currentTripCounter: Int = 0
 
+    override val isTracking = currentTripId.map { it != null }
+
     override fun startTracking() {
         currentTripId.value = UUID.randomUUID().toString()
         currentTripCounter = 0
@@ -30,7 +32,7 @@ class TrackingRepositoryImpl(
                 tripId = requireNotNull(currentTripId.value),
                 tripDetails = TripDetailsRequest(
                     startTime = LocalDateTime.now().toString(),
-                    startLocation = "Start Location",
+                    startLocation = "Start Location", // TODO get address somehow
                 )
             )
         }
