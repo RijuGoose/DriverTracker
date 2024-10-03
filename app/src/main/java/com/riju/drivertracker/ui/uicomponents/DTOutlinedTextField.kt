@@ -47,21 +47,13 @@ fun DTOutlinedTextField(
         enabled = enabled,
         readOnly = readOnly,
         textStyle = textStyle,
-        label = {
-            label?.let {
-                Text(it)
-            }
-        },
+        label = label?.let { { Text(it) } },
         placeholder = placeholder,
         leadingIcon = leadingIcon,
         trailingIcon = trailingIcon,
         prefix = prefix,
         suffix = suffix,
-        supportingText = {
-            supportingText?.let {
-                Text(it)
-            }
-        },
+        supportingText = supportingText?.let { { Text(it) } },
         isError = isError,
         visualTransformation = visualTransformation,
         keyboardOptions = keyboardOptions,

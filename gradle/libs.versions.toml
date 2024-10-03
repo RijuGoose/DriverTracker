@@ -1,6 +1,7 @@
 [versions]
 accompanistPermissions = "0.36.0"
 agp = "8.5.0"
+datastorePreferences = "1.1.1"
 detektFormatting = "1.23.6"
 firebaseBom = "33.2.0"
 kotlin = "2.0.0"
@@ -29,6 +30,7 @@ constraintlayout = "2.1.4"
 [libraries]
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detektFormatting" }
 firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics" }
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }

@@ -36,6 +36,8 @@ import com.riju.drivertracker.ui.tripdetails.TripDetailsScreen
 import com.riju.drivertracker.ui.tripdetails.TripDetailsViewModel
 import com.riju.drivertracker.ui.triphistory.TripHistoryScreen
 import com.riju.drivertracker.ui.triphistory.TripHistoryViewModel
+import com.riju.drivertracker.ui.tripsettings.TripSettingsScreen
+import com.riju.drivertracker.ui.tripsettings.TripSettingsViewModel
 
 @Composable
 fun MainScreen(
@@ -78,7 +80,7 @@ fun MainScreen(
                     val viewModel = hiltViewModel<TripDetailsViewModel>()
                     TripDetailsScreen(
                         viewModel = viewModel,
-                        onBackPressed = { mainNavHostController.navigateUp() }
+                        onBackPressed = mainNavHostController::navigateUp
                     )
                 }
             }
@@ -89,6 +91,17 @@ fun MainScreen(
                     MainMenuScreen(
                         viewModel = viewModel,
                         onLogout = onLogout,
+                        onAutomaticTripClicked = {
+                            mainNavHostController.navigate(Screen.TripSettings)
+                        }
+                    )
+                }
+
+                composable<Screen.TripSettings> {
+                    val viewModel = hiltViewModel<TripSettingsViewModel>()
+                    TripSettingsScreen(
+                        viewModel = viewModel,
+                        onBackButtonClicked = mainNavHostController::navigateUp
                     )
                 }
             }
@@ -111,7 +124,7 @@ private fun DTBottomNavigationBar(navController: NavHostController) {
         ),
         TopLevelRoute(
             stringResource(R.string.navigation_main_menu),
-            Screen.MainMenu,
+            Screen.Menu,
             Icons.Outlined.Menu
         )
     )

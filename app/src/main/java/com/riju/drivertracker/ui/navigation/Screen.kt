@@ -32,6 +32,9 @@ sealed class Screen {
 
     @Serializable
     data object MainMenu : Screen()
+
+    @Serializable
+    data object TripSettings : Screen()
 }
 
 enum class CurrentTripAction {
