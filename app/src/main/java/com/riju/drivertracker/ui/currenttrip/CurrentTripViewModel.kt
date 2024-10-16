@@ -49,10 +49,7 @@ class CurrentTripViewModel @Inject constructor(
         when (action) {
             CurrentTripAction.Start -> {
                 if (!trackingRepository.isTracking()) {
-                    Intent(context, LocationService::class.java).apply {
-                        this.action = LocationService.ACTION_TRIP_START
-                        context.startService(this)
-                    }
+                    startLocationService()
                 } else {
                     showSnackBar(context.getString(R.string.current_trip_trip_already_running))
                 }
@@ -60,10 +57,7 @@ class CurrentTripViewModel @Inject constructor(
 
             CurrentTripAction.Stop -> {
                 if (trackingRepository.isTracking()) {
-                    Intent(context, LocationService::class.java).apply {
-                        this.action = LocationService.ACTION_TRIP_STOP
-                        context.startService(this)
-                    }
+                    stopLocationService()
                 } else {
                     _screenStatus.value = ScreenStatus.ErrorFullScreen(
                         error = context.getString(R.string.current_trip_error_no_running_trip)
@@ -80,8 +74,8 @@ class CurrentTripViewModel @Inject constructor(
     fun startLocationService() {
         showLoadingDialog()
         Intent(context, LocationService::class.java).apply {
-            action = LocationService.ACTION_TRIP_START
-            context.startService(this)
+            this.action = LocationService.ACTION_TRIP_START
+            context.startForegroundService(this)
         }
         hideLoadingDialog()
     }
@@ -89,8 +83,8 @@ class CurrentTripViewModel @Inject constructor(
     fun stopLocationService() {
         showLoadingDialog()
         Intent(context, LocationService::class.java).apply {
-            action = LocationService.ACTION_TRIP_STOP
-            context.startService(this)
+            this.action = LocationService.ACTION_TRIP_STOP
+            context.startForegroundService(this)
         }
         hideLoadingDialog()
     }

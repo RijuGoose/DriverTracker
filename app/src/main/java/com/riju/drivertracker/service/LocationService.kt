@@ -3,6 +3,7 @@ package com.riju.drivertracker.service
 import android.app.NotificationManager
 import android.app.Service
 import android.content.Intent
+import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.riju.drivertracker.repository.LocationRepository
@@ -68,7 +69,7 @@ class LocationService : Service() {
             }
             .launchIn(serviceScope)
 
-        startForeground(1, notification.build())
+        startForeground(1, notification.build(), FOREGROUND_SERVICE_TYPE_LOCATION)
     }
 
     private fun stop() {

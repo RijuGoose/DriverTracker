@@ -21,4 +21,8 @@ class SettingsRepositoryImpl(
     override suspend fun setBluetoothDeviceName(value: String) {
         settingsDataSource.updateSettings { it.copy(btDeviceName = value) }
     }
+
+    override suspend fun setBluetoothDeviceMacAddress(value: String) {
+        settingsDataSource.updateSettings { it.copy(btDeviceMacAddress = value) }
+    }
 }

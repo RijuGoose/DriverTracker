@@ -19,7 +19,7 @@ object BluetoothDependencies {
 
     @Singleton
     @Provides
-    fun privateBluetoothRepositoryImpl(
+    fun provideBluetoothRepositoryImpl(
         bluetoothAdapter: BluetoothAdapter?,
         @ApplicationContext context: Context,
     ): BluetoothRepository {

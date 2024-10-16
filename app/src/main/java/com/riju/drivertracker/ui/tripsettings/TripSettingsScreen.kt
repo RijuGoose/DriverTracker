@@ -16,6 +16,8 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -23,8 +25,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
-import com.google.accompanist.permissions.shouldShowRationale
+import com.riju.drivertracker.extensions.shouldShowDialog
 import com.riju.drivertracker.ui.tripsettings.components.SwitchCard
+import com.riju.drivertracker.ui.uicomponents.DTAlertDialog
 import com.riju.drivertracker.ui.uicomponents.DTOutlinedTextField
 import com.riju.drivertracker.ui.uicomponents.DTScaffold
 import com.riju.drivertracker.ui.uicomponents.DTTopAppBar
@@ -34,16 +37,37 @@ import com.riju.drivertracker.ui.uicomponents.DTTopAppBar
 fun TripSettingsScreen(viewModel: TripSettingsViewModel, onBackButtonClicked: (() -> Unit)?) {
     val settings by viewModel.settings.collectAsStateWithLifecycle()
     val btDeviceName by viewModel.btDeviceName.collectAsStateWithLifecycle()
+    val backgroundLocationPermissionDialog by viewModel.backgroundLocationPermissionDialog.collectAsStateWithLifecycle()
+    val bluetoothPermissionDialog by viewModel.bluetoothPermissionDialog.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
+
+    val backgroundLocationPermissionState =
+        rememberPermissionState(permission = android.Manifest.permission.ACCESS_BACKGROUND_LOCATION)
 
     val bluetoothPermissionState =
         rememberPermissionState(
             permission = android.Manifest.permission.BLUETOOTH_CONNECT,
             onPermissionResult = { granted ->
-                viewModel.setAutomaticTrip(granted)
+                if (backgroundLocationPermissionState.status.isGranted) {
+                    viewModel.setAutomaticTrip(granted)
+                } else {
+                    viewModel.showBackgroundLocationPermissionDialog()
+                }
             }
         )
+
+    val bluetoothChecked by remember(
+        settings.automaticTrip,
+        bluetoothPermissionState.status,
+        backgroundLocationPermissionState.status
+    ) {
+        mutableStateOf(
+            settings.automaticTrip &&
+                bluetoothPermissionState.status.isGranted &&
+                backgroundLocationPermissionState.status.isGranted
+        )
+    }
 
     DTScaffold(
         viewModel = viewModel,
@@ -56,25 +80,23 @@ fun TripSettingsScreen(viewModel: TripSettingsViewModel, onBackButtonClicked: ((
             OutlinedCard {
                 SwitchCard(
                     text = "Automatic trip",
-                    checked = settings.automaticTrip && bluetoothPermissionState.status.isGranted,
+                    checked = bluetoothChecked,
                     onCheckedChange = { checked ->
                         if (bluetoothPermissionState.status.isGranted) {
-                            viewModel.setAutomaticTrip(checked)
-                        } else if (bluetoothPermissionState.status.shouldShowRationale &&
-                            bluetoothPermissionState.status.isGranted.not()
-                        ) {
-                            // TODO refactor
-                            val settingsIntent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                            val uri = Uri.fromParts("package", context.packageName, null)
-                            settingsIntent.data = uri
-                            context.startActivity(settingsIntent)
+                            if (backgroundLocationPermissionState.status.isGranted) {
+                                viewModel.setAutomaticTrip(checked)
+                            } else {
+                                viewModel.showBackgroundLocationPermissionDialog()
+                            }
+                        } else if (bluetoothPermissionState.shouldShowDialog()) {
+                            viewModel.showBluetoothPermissionDialog()
                         } else {
                             bluetoothPermissionState.launchPermissionRequest()
                         }
                     }
                 )
 
-                AnimatedVisibility(visible = settings.automaticTrip && bluetoothPermissionState.status.isGranted) {
+                AnimatedVisibility(visible = bluetoothChecked) {
                     Column(
                         modifier = Modifier.padding(8.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -104,5 +126,47 @@ fun TripSettingsScreen(viewModel: TripSettingsViewModel, onBackButtonClicked: ((
                 onCheckedChange = viewModel::setTripCalendarEvent
             ) // TODO add calendar event
         }
+
+        if (backgroundLocationPermissionDialog) {
+            PermissionAlertDialog(
+                permissionName = "Background location",
+                onConfirmButton = {
+                    backgroundLocationPermissionState.launchPermissionRequest()
+                    viewModel.hideBackgroundLocationPermissionDialog()
+                },
+                onDismissDialog = viewModel::hideBackgroundLocationPermissionDialog
+            )
+        }
+
+        if (bluetoothPermissionDialog) {
+            PermissionAlertDialog(
+                permissionName = "Bluetooth",
+                onConfirmButton = {
+                    // TODO refact
+                    val settingsIntent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                    val uri = Uri.fromParts("package", context.packageName, null)
+                    settingsIntent.data = uri
+                    context.startActivity(settingsIntent)
+                    viewModel.hideBluetoothPermissionDialog()
+                },
+                onDismissDialog = viewModel::hideBluetoothPermissionDialog
+            )
+        }
     }
+}
+
+@Composable
+private fun PermissionAlertDialog(
+    permissionName: String,
+    onConfirmButton: () -> Unit,
+    onDismissDialog: () -> Unit
+) {
+    DTAlertDialog(
+        title = "$permissionName permission required",
+        text = "$permissionName permission is required for this feature. " +
+            "Please enable it in the app settings.",
+        onDismissDialog = onDismissDialog,
+        confirmButtonText = "Open settings",
+        onConfirmButton = onConfirmButton
+    )
 }

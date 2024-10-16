@@ -7,4 +7,5 @@ data class SettingsDataStoreModel(
     val automaticTrip: Boolean = false,
     val calendarEvent: Boolean = false,
     val btDeviceName: String = "",
+    val btDeviceMacAddress: String = ""
 )

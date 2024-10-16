@@ -23,6 +23,10 @@ class TripSettingsViewModel @Inject constructor(
     private val settingsRepository: SettingsRepository,
     private val bluetoothRepository: BluetoothRepository
 ) : BaseViewModel<Unit>() {
+    private val _bluetoothPermissionDialog = MutableStateFlow(false)
+    val bluetoothPermissionDialog = _bluetoothPermissionDialog.asStateFlow()
+    private val _backgroundLocationPermissionDialog = MutableStateFlow(false)
+    val backgroundLocationPermissionDialog = _backgroundLocationPermissionDialog.asStateFlow()
 
     val settings =
         settingsRepository.settings.stateIn(
@@ -58,6 +62,22 @@ class TripSettingsViewModel @Inject constructor(
 
     fun getBondedBTDevices() {
         btBondedDevices = bluetoothRepository.getBondedDevices()
+    }
+
+    fun showBackgroundLocationPermissionDialog() {
+        _backgroundLocationPermissionDialog.value = true
+    }
+
+    fun hideBackgroundLocationPermissionDialog() {
+        _backgroundLocationPermissionDialog.value = false
+    }
+
+    fun showBluetoothPermissionDialog() {
+        _bluetoothPermissionDialog.value = true
+    }
+
+    fun hideBluetoothPermissionDialog() {
+        _bluetoothPermissionDialog.value = false
     }
 
     init {

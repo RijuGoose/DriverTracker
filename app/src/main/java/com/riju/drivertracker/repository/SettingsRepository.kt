@@ -8,4 +8,5 @@ interface SettingsRepository {
     suspend fun setAutomaticTrip(value: Boolean)
     suspend fun setBluetoothDeviceName(value: String)
     suspend fun setTripCalendarEvent(value: Boolean)
+    suspend fun setBluetoothDeviceMacAddress(value: String)
 }
