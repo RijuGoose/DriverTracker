@@ -1,8 +1,11 @@
 package com.riju.drivertracker.ui.tripsettings
 
+import android.annotation.SuppressLint
 import androidx.lifecycle.viewModelScope
 import com.riju.drivertracker.datasource.model.SettingsDataStoreModel
+import com.riju.drivertracker.repository.BluetoothRepository
 import com.riju.drivertracker.repository.SettingsRepository
+import com.riju.drivertracker.repository.model.BTDevice
 import com.riju.drivertracker.ui.BaseViewModel
 import com.riju.drivertracker.ui.ScreenStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,16 +17,22 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@SuppressLint("MissingPermission")
 @HiltViewModel
 class TripSettingsViewModel @Inject constructor(
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
+    private val bluetoothRepository: BluetoothRepository
 ) : BaseViewModel<Unit>() {
+
     val settings =
         settingsRepository.settings.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
             initialValue = SettingsDataStoreModel()
         )
+
+    var btBondedDevices: List<BTDevice> = emptyList()
+        private set
 
     private val _btDeviceName = MutableStateFlow("")
     val btDeviceName = _btDeviceName.asStateFlow()
@@ -45,6 +54,10 @@ class TripSettingsViewModel @Inject constructor(
         viewModelScope.launch {
             settingsRepository.setBluetoothDeviceName(value)
         }
+    }
+
+    fun getBondedBTDevices() {
+        btBondedDevices = bluetoothRepository.getBondedDevices()
     }
 
     init {
