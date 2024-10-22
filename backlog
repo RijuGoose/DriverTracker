@@ -6,3 +6,6 @@
 - modularize
 - can i use cloud messaging and push notifications somehow?
 - open other user's trips (via tripid, qr code from tripid?)
+- show a color scale for the speed
+- bitrise and CI/CD integration
+- dev and prod build, separated projects in firebase

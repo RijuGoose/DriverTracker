@@ -1,8 +1,5 @@
 package com.riju.drivertracker.ui.tripsettings
 
-import android.content.Intent
-import android.net.Uri
-import android.provider.Settings
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,12 +22,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import com.riju.drivertracker.extensions.openSettings
 import com.riju.drivertracker.extensions.shouldShowDialog
 import com.riju.drivertracker.ui.tripsettings.components.SwitchCard
-import com.riju.drivertracker.ui.uicomponents.DTAlertDialog
 import com.riju.drivertracker.ui.uicomponents.DTOutlinedTextField
 import com.riju.drivertracker.ui.uicomponents.DTScaffold
 import com.riju.drivertracker.ui.uicomponents.DTTopAppBar
+import com.riju.drivertracker.ui.uicomponents.PermissionAlertDialog
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -142,31 +140,11 @@ fun TripSettingsScreen(viewModel: TripSettingsViewModel, onBackButtonClicked: ((
             PermissionAlertDialog(
                 permissionName = "Bluetooth",
                 onConfirmButton = {
-                    // TODO refact
-                    val settingsIntent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                    val uri = Uri.fromParts("package", context.packageName, null)
-                    settingsIntent.data = uri
-                    context.startActivity(settingsIntent)
+                    context.openSettings()
                     viewModel.hideBluetoothPermissionDialog()
                 },
                 onDismissDialog = viewModel::hideBluetoothPermissionDialog
             )
         }
     }
-}
-
-@Composable
-private fun PermissionAlertDialog(
-    permissionName: String,
-    onConfirmButton: () -> Unit,
-    onDismissDialog: () -> Unit
-) {
-    DTAlertDialog(
-        title = "$permissionName permission required",
-        text = "$permissionName permission is required for this feature. " +
-            "Please enable it in the app settings.",
-        onDismissDialog = onDismissDialog,
-        confirmButtonText = "Open settings",
-        onConfirmButton = onConfirmButton
-    )
 }
