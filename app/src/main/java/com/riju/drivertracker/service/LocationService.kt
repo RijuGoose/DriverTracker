@@ -7,7 +7,9 @@ import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.riju.drivertracker.repository.LocationRepository
+import com.riju.drivertracker.repository.PermissionRepository
 import com.riju.drivertracker.repository.TrackingRepository
+import com.riju.drivertracker.repository.model.UserPermissionState
 import com.riju.drivertracker.service.model.TrackingPoint
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -30,6 +32,9 @@ class LocationService : Service() {
 
     @Inject
     lateinit var trackingRepository: TrackingRepository
+
+    @Inject
+    lateinit var permissionRepository: PermissionRepository
 
     override fun onBind(intent: Intent?): IBinder? {
         return null
@@ -57,15 +62,24 @@ class LocationService : Service() {
                 notificationManager.notify(1, notification.build())
                 trackingRepository.startTracking()
             }
-            .onEach { location ->
-                // TODO try catch
-                trackingRepository.addRoutePoint(
-                    TrackingPoint(
-                        lat = location.latitude,
-                        lon = location.longitude,
-                        speed = (location.speed * 3.6).toBigDecimal().setScale(2, RoundingMode.HALF_UP).toDouble()
-                    )
-                )
+            .onEach { locationState ->
+                when (locationState) {
+                    is UserPermissionState.Granted -> {
+                        trackingRepository.addRoutePoint(
+                            TrackingPoint(
+                                lat = locationState.value.latitude,
+                                lon = locationState.value.longitude,
+                                speed = (locationState.value.speed * 3.6).toBigDecimal()
+                                    .setScale(2, RoundingMode.HALF_UP).toDouble()
+                            )
+                        )
+                    }
+
+                    is UserPermissionState.Denied -> {
+                        // TODO notify user about location permission denied
+                        stop()
+                    }
+                }
             }
             .launchIn(serviceScope)
 

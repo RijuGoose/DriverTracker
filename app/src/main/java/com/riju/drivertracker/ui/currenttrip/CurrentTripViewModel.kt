@@ -9,6 +9,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.riju.drivertracker.R
 import com.riju.drivertracker.repository.LocationRepository
 import com.riju.drivertracker.repository.TrackingRepository
+import com.riju.drivertracker.repository.model.UserPermissionState
 import com.riju.drivertracker.service.LocationService
 import com.riju.drivertracker.ui.BaseViewModel
 import com.riju.drivertracker.ui.ScreenStatus
@@ -16,7 +17,9 @@ import com.riju.drivertracker.ui.navigation.CurrentTripAction
 import com.riju.drivertracker.ui.navigation.Screen
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
@@ -43,6 +46,9 @@ class CurrentTripViewModel @Inject constructor(
         started = SharingStarted.WhileSubscribed(),
         initialValue = false
     )
+
+    private val _locationPermissionDialog = MutableStateFlow(false)
+    val locationPermissionDialog = _locationPermissionDialog.asStateFlow()
 
     init {
         val action = savedStateHandle.toRoute<Screen.CurrentTrip>().action
@@ -90,9 +96,23 @@ class CurrentTripViewModel @Inject constructor(
     }
 
     suspend fun getCurrentLocation(): LatLng? {
-        return locationRepository.getCurrentLocation()?.let {
-            LatLng(it.latitude, it.longitude)
+        return when (val locationPermissionState = locationRepository.getCurrentLocation()) {
+            is UserPermissionState.Granted -> {
+                LatLng(locationPermissionState.value.latitude, locationPermissionState.value.longitude)
+            }
+
+            else -> {
+                null
+            }
         }
+    }
+
+    fun showLocationPermissionDialog() {
+        _locationPermissionDialog.value = true
+    }
+
+    fun hideLocationPermissionDialog() {
+        _locationPermissionDialog.value = false
     }
 
     companion object {

@@ -17,6 +17,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -29,8 +30,11 @@ import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.riju.drivertracker.R
+import com.riju.drivertracker.extensions.openSettings
+import com.riju.drivertracker.extensions.shouldShowDialog
 import com.riju.drivertracker.ui.uicomponents.DTScaffold
 import com.riju.drivertracker.ui.uicomponents.DTTopAppBar
+import com.riju.drivertracker.ui.uicomponents.PermissionAlertDialog
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -42,6 +46,8 @@ fun CurrentTripScreen(
     val coroutineScope = rememberCoroutineScope()
     val currentTripRoute by viewModel.currentTripRoute.collectAsStateWithLifecycle()
     val isTracking by viewModel.isTracking.collectAsStateWithLifecycle()
+    val locationPermissionDialog by viewModel.locationPermissionDialog.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     val allPermissions = rememberMultiplePermissionsState(
         permissions =
@@ -67,7 +73,7 @@ fun CurrentTripScreen(
     )
 
     LaunchedEffect(Unit) {
-        if (!allPermissions.allPermissionsGranted) {
+        if (!allPermissions.shouldShowDialog()) {
             allPermissions.launchMultiplePermissionRequest()
         }
     }
@@ -88,8 +94,16 @@ fun CurrentTripScreen(
             ) {
                 Button(
                     modifier = Modifier.weight(1f),
-                    onClick = viewModel::startLocationService,
-                    enabled = locationPermissionState.allPermissionsGranted && !isTracking,
+                    onClick = {
+                        if (locationPermissionState.allPermissionsGranted) {
+                            viewModel.startLocationService()
+                        } else if (locationPermissionState.shouldShowDialog()) {
+                            viewModel.showLocationPermissionDialog()
+                        } else {
+                            locationPermissionState.launchMultiplePermissionRequest()
+                        }
+                    },
+                    enabled = !isTracking,
                     colors = ButtonDefaults.buttonColors().copy(
                         containerColor = MaterialTheme.colorScheme.tertiaryContainer,
                         contentColor = MaterialTheme.colorScheme.onTertiaryContainer
@@ -136,6 +150,17 @@ fun CurrentTripScreen(
                     }
                 }
             }
+        }
+
+        if (locationPermissionDialog) {
+            PermissionAlertDialog(
+                permissionName = "Location",
+                onConfirmButton = {
+                    context.openSettings()
+                    viewModel.hideLocationPermissionDialog()
+                },
+                onDismissDialog = viewModel::hideLocationPermissionDialog
+            )
         }
     }
 }
