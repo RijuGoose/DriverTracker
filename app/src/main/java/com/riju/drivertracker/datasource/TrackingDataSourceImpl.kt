@@ -48,13 +48,18 @@ class TrackingDataSourceImpl(
             .setValue(routePoint)
     }
 
-    override suspend fun getAllTripHistory(user: FirebaseUser, orderBy: String): Map<String, TripDetailsResponse>? {
+    override suspend fun getAllTripHistory(user: FirebaseUser, orderBy: String): List<TripDetailsResponse> {
         return database
             .child(DatabaseConstants.LIST_USERS)
             .child(user.uid)
             .child(DatabaseConstants.LIST_TRIPS)
             .orderByChild(orderBy)
-            .get().await().getValue<Map<String, TripDetailsResponse>>()
+            .get()
+            .await().children.map { dataSnapshot ->
+                dataSnapshot.getValue<TripDetailsResponse>()?.copy(
+                    tripId = dataSnapshot.key.toString()
+                ) ?: return emptyList()
+            }
     }
 
     override suspend fun getTripHistoryRouteById(

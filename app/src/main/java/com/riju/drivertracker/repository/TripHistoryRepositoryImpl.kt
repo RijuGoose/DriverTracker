@@ -11,13 +11,13 @@ class TripHistoryRepositoryImpl(
 ) : TripHistoryRepository {
     override suspend fun getAllTripHistory(orderBy: String): List<TripDetails>? {
         return userDataSource.getUser()?.let { currentUser ->
-            trackingDataSource.getAllTripHistory(currentUser, orderBy)?.map { tripDetails ->
+            trackingDataSource.getAllTripHistory(currentUser, orderBy).map { tripDetails ->
                 TripDetails(
-                    tripId = tripDetails.key,
-                    startTime = tripDetails.value.startTime,
-                    endTime = tripDetails.value.endTime,
-                    startLocation = tripDetails.value.startLocation,
-                    endLocation = tripDetails.value.endLocation,
+                    tripId = tripDetails.tripId,
+                    startTime = tripDetails.startTime,
+                    endTime = tripDetails.endTime,
+                    startLocation = tripDetails.startLocation,
+                    endLocation = tripDetails.endLocation,
                 )
             }
         }
