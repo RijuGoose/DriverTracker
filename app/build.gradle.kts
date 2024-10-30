@@ -62,6 +62,11 @@ android {
 }
 
 dependencies {
+    implementation(project(":repository"))
+    implementation(project(":repositoryimpl"))
+    implementation(project(":localdatasource"))
+    implementation(project(":remotedatasource"))
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -71,7 +76,6 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.maps.compose)
-    implementation(libs.play.services.location)
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.lifecycle.runtime.compose.android)

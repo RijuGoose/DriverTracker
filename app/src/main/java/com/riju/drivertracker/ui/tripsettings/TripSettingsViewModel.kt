@@ -2,12 +2,12 @@ package com.riju.drivertracker.ui.tripsettings
 
 import android.annotation.SuppressLint
 import androidx.lifecycle.viewModelScope
-import com.riju.drivertracker.datasource.model.SettingsDataStoreModel
-import com.riju.drivertracker.repository.BluetoothRepository
-import com.riju.drivertracker.repository.SettingsRepository
-import com.riju.drivertracker.repository.model.BTDevice
 import com.riju.drivertracker.ui.BaseViewModel
 import com.riju.drivertracker.ui.ScreenStatus
+import com.riju.repository.BluetoothRepository
+import com.riju.repository.SettingsRepository
+import com.riju.repository.model.BTDevice
+import com.riju.repository.model.Settings
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -32,7 +32,12 @@ class TripSettingsViewModel @Inject constructor(
         settingsRepository.settings.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
-            initialValue = SettingsDataStoreModel()
+            initialValue = Settings( // TODO temporary solution (should be removed later)
+                automaticTrip = false,
+                calendarEvent = false,
+                btDeviceName = "",
+                btDeviceMacAddress = ""
+            )
         )
 
     var btBondedDevices: List<BTDevice> = emptyList()

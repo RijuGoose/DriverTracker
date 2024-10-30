@@ -1,10 +1,10 @@
 package com.riju.drivertracker
 
 import androidx.lifecycle.ViewModel
-import com.riju.drivertracker.repository.UserRepository
 import com.riju.drivertracker.service.LocationService
 import com.riju.drivertracker.ui.navigation.CurrentTripAction
 import com.riju.drivertracker.ui.navigation.Screen
+import com.riju.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 

@@ -7,14 +7,14 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.google.android.gms.maps.model.LatLng
 import com.riju.drivertracker.R
-import com.riju.drivertracker.repository.LocationRepository
-import com.riju.drivertracker.repository.TrackingRepository
-import com.riju.drivertracker.repository.model.UserPermissionState
 import com.riju.drivertracker.service.LocationService
 import com.riju.drivertracker.ui.BaseViewModel
 import com.riju.drivertracker.ui.ScreenStatus
 import com.riju.drivertracker.ui.navigation.CurrentTripAction
 import com.riju.drivertracker.ui.navigation.Screen
+import com.riju.repository.LocationRepository
+import com.riju.repository.TrackingRepository
+import com.riju.repository.model.UserPermissionState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow

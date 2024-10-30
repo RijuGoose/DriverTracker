@@ -6,11 +6,11 @@ import android.content.Intent
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
-import com.riju.drivertracker.repository.LocationRepository
-import com.riju.drivertracker.repository.PermissionRepository
-import com.riju.drivertracker.repository.TrackingRepository
-import com.riju.drivertracker.repository.model.UserPermissionState
-import com.riju.drivertracker.service.model.TrackingPoint
+import com.riju.repository.LocationRepository
+import com.riju.repository.PermissionRepository
+import com.riju.repository.TrackingRepository
+import com.riju.repository.model.TrackingPoint
+import com.riju.repository.model.UserPermissionState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

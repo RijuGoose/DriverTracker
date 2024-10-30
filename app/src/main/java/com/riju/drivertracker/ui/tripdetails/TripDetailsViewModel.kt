@@ -10,10 +10,10 @@ import androidx.navigation.toRoute
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.riju.drivertracker.R
-import com.riju.drivertracker.repository.TripHistoryRepository
 import com.riju.drivertracker.ui.BaseViewModel
 import com.riju.drivertracker.ui.ScreenStatus
 import com.riju.drivertracker.ui.navigation.Screen
+import com.riju.repository.TripHistoryRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -5,9 +5,9 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import com.riju.drivertracker.extensions.goAsync
-import com.riju.drivertracker.repository.PermissionRepository
-import com.riju.drivertracker.repository.SettingsRepository
 import com.riju.drivertracker.service.LocationService
+import com.riju.repository.PermissionRepository
+import com.riju.repository.SettingsRepository
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject

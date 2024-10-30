@@ -11,3 +11,4 @@
 - bitrise and CI/CD integration
 - dev and prod build, separated projects in firebase
 - predictive back
+- select paired bt-s or type in custom

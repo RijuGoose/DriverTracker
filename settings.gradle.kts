@@ -21,3 +21,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "DriverTracker"
 include(":app")
+include(":localdatasource")
+include(":remotedatasource")
+include(":repository")
+include(":repositoryimpl")

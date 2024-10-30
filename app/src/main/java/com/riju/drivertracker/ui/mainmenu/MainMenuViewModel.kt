@@ -2,9 +2,9 @@ package com.riju.drivertracker.ui.mainmenu
 
 import android.content.Context
 import com.riju.drivertracker.R
-import com.riju.drivertracker.repository.UserRepository
 import com.riju.drivertracker.ui.BaseViewModel
 import com.riju.drivertracker.ui.ScreenStatus
+import com.riju.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableSharedFlow
