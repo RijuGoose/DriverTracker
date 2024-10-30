@@ -88,6 +88,7 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.accompanist.permissions)
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.material.icons.extended)
     ksp(libs.hilt.compiler)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

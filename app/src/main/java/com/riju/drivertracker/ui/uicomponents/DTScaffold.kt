@@ -83,12 +83,15 @@ fun <T : Any> DTScaffold(
                     },
                     navigationIcon = {
                         if (topBar.onBackButtonClicked != null) {
-                            IconButton(
-                                onClick = {
-                                    topBar.onBackButtonClicked.invoke()
-                                }
-                            ) {
+                            IconButton(onClick = topBar.onBackButtonClicked::invoke) {
                                 Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                            }
+                        }
+                    },
+                    actions = {
+                        topBar.actionButtons?.forEach { actionButton ->
+                            IconButton(onClick = actionButton.onClick::invoke) {
+                                Icon(actionButton.icon, contentDescription = actionButton.contentDescription)
                             }
                         }
                     }
