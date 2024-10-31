@@ -17,7 +17,8 @@ class MainViewModel @Inject constructor(
     var mainStartScreen: Screen = Screen.CurrentTrip()
 
     fun setStartScreen(intentAction: String?) {
-        startScreen = if (currentUser != null) {
+        startScreen =
+//            if (currentUser != null) {
             when (intentAction) {
                 LocationService.ACTION_TRIP_START -> {
                     mainStartScreen = Screen.CurrentTrip(action = CurrentTripAction.Start)
@@ -33,8 +34,8 @@ class MainViewModel @Inject constructor(
                     Screen.Main
                 }
             }
-        } else {
-            Screen.Auth
-        }
+//            } else {
+//                Screen.Auth // uncomment when user registration is enabled
+//            }
     }
 }

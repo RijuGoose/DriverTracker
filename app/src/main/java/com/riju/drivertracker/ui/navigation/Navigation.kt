@@ -38,6 +38,9 @@ fun DTNavHost(
                         navHostController.navigate(Screen.Main) {
                             popUpTo(0)
                         }
+                    },
+                    navigateWithoutLogin = {
+                        navHostController.navigate(Screen.Main)
                     }
                 )
             }

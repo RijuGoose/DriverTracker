@@ -17,9 +17,9 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
-class TrackingDataSourceImpl @Inject constructor(
+class RemoteTrackingDataSourceImpl @Inject constructor(
     private val database: DatabaseReference
-) : TrackingDataSource {
+) : RemoteTrackingDataSource {
     override fun addTripDetails(user: FirebaseUser, tripId: String, tripDetails: TripDetailsRequest) {
         database
             .child(DatabaseConstants.LIST_USERS)
@@ -84,7 +84,7 @@ class TrackingDataSourceImpl @Inject constructor(
             .get().await().getValue<TripDetailsResponse>()
     }
 
-    override fun getCurrentTripFlow(user: FirebaseUser, tripId: String): Flow<List<RoutePointResponse>?> {
+    override fun getTripFlow(user: FirebaseUser, tripId: String): Flow<List<RoutePointResponse>?> {
         return callbackFlow {
             val tripListener = object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {

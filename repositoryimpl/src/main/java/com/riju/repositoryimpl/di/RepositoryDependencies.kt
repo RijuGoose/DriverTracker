@@ -18,6 +18,7 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -32,9 +33,11 @@ abstract class RepositoryDependencies {
     @Binds
     abstract fun providePermissionRepositoryImpl(impl: PermissionRepositoryImpl): PermissionRepository
 
+    @Singleton
     @Binds
     abstract fun provideSettingsRepository(impl: SettingsRepositoryImpl): SettingsRepository
 
+    @Singleton
     @Binds
     abstract fun provideTrackingRepositoryImpl(impl: TrackingRepositoryImpl): TrackingRepository
 

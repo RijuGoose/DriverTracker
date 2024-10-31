@@ -1,8 +1,12 @@
 package com.riju.repositoryimpl
 
-import com.riju.remotedatasourceimpl.TrackingDataSource
+import com.riju.localdatasourceimpl.LocalTrackingDataSource
+import com.riju.localdatasourceimpl.model.RoutePointEntity
+import com.riju.localdatasourceimpl.model.TripEntity
+import com.riju.remotedatasourceimpl.RemoteTrackingDataSource
 import com.riju.remotedatasourceimpl.UserDataSource
 import com.riju.remotedatasourceimpl.model.routepoint.RoutePointRequest
+import com.riju.remotedatasourceimpl.model.tripdetails.TripDetailsRequest
 import com.riju.repository.TrackingRepository
 import com.riju.repository.model.TrackingPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -16,7 +20,8 @@ import java.util.UUID
 import javax.inject.Inject
 
 class TrackingRepositoryImpl @Inject constructor(
-    private val trackingDataSource: TrackingDataSource,
+    private val remoteTrackingDataSource: RemoteTrackingDataSource,
+    private val localTrackingDataSource: LocalTrackingDataSource,
     private val userDataSource: UserDataSource
 ) : TrackingRepository {
     private val currentTripId: MutableStateFlow<String?> = MutableStateFlow(null)
@@ -28,38 +33,54 @@ class TrackingRepositoryImpl @Inject constructor(
         currentTripId.value = UUID.randomUUID().toString()
         currentTripCounter = 0
         userDataSource.getUser()?.let { currentUser ->
-            trackingDataSource.addTripDetails(
+            remoteTrackingDataSource.addTripDetails(
                 user = currentUser,
                 tripId = requireNotNull(currentTripId.value),
-                tripDetails = com.riju.remotedatasourceimpl.model.tripdetails.TripDetailsRequest(
+                tripDetails = TripDetailsRequest(
                     startTime = LocalDateTime.now().toString(),
                     startLocation = "Start Location", // TODO get address somehow
                 )
             )
-        }
+        } ?: localTrackingDataSource.addTrip(
+            trip = TripEntity(
+                tripId = requireNotNull(currentTripId.value),
+                startTime = LocalDateTime.now().toString(),
+                startLocation = "Start Location" // TODO get address somehow
+            )
+        )
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun getCurrentTripFlow(): Flow<List<TrackingPoint>?> {
-        return userDataSource.getUserFlow().filterNotNull().flatMapLatest { currentUser ->
+        return userDataSource.getUserFlow().flatMapLatest { currentUser ->
             currentTripId.filterNotNull().flatMapLatest { tripId ->
-                trackingDataSource.getCurrentTripFlow(currentUser, tripId)
-                    .map { routePoints ->
-                        routePoints?.map { routePoint ->
-                            TrackingPoint(
-                                lat = routePoint.latitude,
-                                lon = routePoint.longitude,
-                                speed = routePoint.speed
-                            )
-                        } ?: emptyList()
-                    }
+                currentUser?.let {
+                    remoteTrackingDataSource.getTripFlow(currentUser, tripId)
+                        .map { routePoints ->
+                            routePoints?.map { routePoint ->
+                                TrackingPoint(
+                                    lat = routePoint.latitude,
+                                    lon = routePoint.longitude,
+                                    speed = routePoint.speed
+                                )
+                            } ?: emptyList()
+                        }
+                } ?: localTrackingDataSource.getTripPointsFlow(tripId).map { routePoints ->
+                    routePoints?.map { routePoint ->
+                        TrackingPoint(
+                            lat = routePoint.latitude,
+                            lon = routePoint.longitude,
+                            speed = routePoint.speed
+                        )
+                    } ?: emptyList()
+                }
             }
         }
     }
 
     override fun addRoutePoint(trackingPoint: TrackingPoint) {
         userDataSource.getUser()?.let { currentUser ->
-            trackingDataSource.addRoutePoint(
+            remoteTrackingDataSource.addRoutePoint(
                 user = currentUser,
                 tripId = requireNotNull(currentTripId.value),
                 pointCount = currentTripCounter++,
@@ -69,18 +90,29 @@ class TrackingRepositoryImpl @Inject constructor(
                     speed = trackingPoint.speed
                 )
             )
-        }
+        } ?: localTrackingDataSource.addRoutePoint(
+            routePoint = RoutePointEntity(
+                tripId = requireNotNull(currentTripId.value),
+                pointCount = currentTripCounter++,
+                latitude = trackingPoint.lat,
+                longitude = trackingPoint.lon,
+                speed = trackingPoint.speed
+            )
+        )
     }
 
-    override fun stopTracking() {
+    override suspend fun stopTracking() {
         currentTripCounter = 0
         userDataSource.getUser()?.let { currentUser ->
-            trackingDataSource.modifyEndTime(
+            remoteTrackingDataSource.modifyEndTime(
                 user = currentUser,
                 tripId = requireNotNull(currentTripId.value),
                 endTime = LocalDateTime.now().toString()
             )
-        }
+        } ?: localTrackingDataSource.modifyEndTime(
+            tripId = requireNotNull(currentTripId.value),
+            endTime = LocalDateTime.now().toString()
+        )
         currentTripId.value = null
     }
 

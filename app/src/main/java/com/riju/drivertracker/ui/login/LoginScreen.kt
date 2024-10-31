@@ -12,6 +12,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -35,6 +36,7 @@ fun LoginScreen(
     modifier: Modifier = Modifier,
     onRegisterClicked: () -> Unit,
     onLoginSuccess: () -> Unit,
+    navigateWithoutLogin: () -> Unit
 ) {
     val userName by viewModel.email.collectAsStateWithLifecycle()
     val password by viewModel.password.collectAsStateWithLifecycle()
@@ -108,6 +110,9 @@ fun LoginScreen(
                     onClick = onRegisterClicked
                 ) {
                     Text(text = stringResource(R.string.login_button_register))
+                }
+                TextButton(onClick = navigateWithoutLogin) {
+                    Text(text = "Continue without registration")
                 }
             }
         }

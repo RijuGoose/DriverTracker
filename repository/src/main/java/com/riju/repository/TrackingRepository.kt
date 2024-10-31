@@ -7,7 +7,7 @@ interface TrackingRepository {
     val isTracking: Flow<Boolean>
     fun startTracking()
     fun addRoutePoint(trackingPoint: TrackingPoint)
-    fun stopTracking()
+    suspend fun stopTracking()
     fun isTracking(): Boolean
     fun getCurrentTripFlow(): Flow<List<TrackingPoint>?>
 }
