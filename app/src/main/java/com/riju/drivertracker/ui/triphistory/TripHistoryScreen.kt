@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -24,22 +26,27 @@ fun TripHistoryScreen(
         viewModel = viewModel,
         topBar = DTTopAppBar(
             title = stringResource(R.string.trip_history_top_bar_title)
-        )
+        ),
+        onRefresh = viewModel::getTripHistory,
     ) { tripHistoryList ->
-        Column(modifier = Modifier.fillMaxSize()) {
-            if (tripHistoryList.isEmpty()) {
+        if (tripHistoryList.isEmpty()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState()),
+            ) {
                 Text(stringResource(R.string.trip_history_no_trips_found))
-            } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    items(tripHistoryList) { trip ->
-                        TripHistoryItem(
-                            onTripSelected = onTripSelected,
-                            trip = trip
-                        )
-                    }
+            }
+        } else {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                items(tripHistoryList) { trip ->
+                    TripHistoryItem(
+                        onTripSelected = onTripSelected,
+                        trip = trip
+                    )
                 }
             }
         }

@@ -21,6 +21,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.contentColorFor
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -35,14 +36,56 @@ import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.riju.drivertracker.ui.BaseViewModel
 import com.riju.drivertracker.ui.ScreenStatus
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun <T : Any> DTScaffold(
     viewModel: BaseViewModel<T>,
     modifier: Modifier = Modifier,
+    onRefresh: () -> Unit = {},
+    horizontalPadding: Dp = 8.dp,
+    topBar: DTTopAppBar? = null,
+    floatingActionButton: @Composable () -> Unit = {},
+    floatingActionButtonPosition: FabPosition = FabPosition.End,
+    containerColor: Color = MaterialTheme.colorScheme.background,
+    contentColor: Color = contentColorFor(containerColor),
+    contentWindowInsets: WindowInsets = ScaffoldDefaults.contentWindowInsets,
+    content: @Composable BoxScope.(T) -> Unit
+) {
+    val screenStatus by viewModel.screenStatus.collectAsStateWithLifecycle()
+    val showLoadingDialog by viewModel.showLoadingDialog.collectAsStateWithLifecycle()
+    val isRefreshing by viewModel.showPullToRefresh.collectAsStateWithLifecycle()
+
+    DTScaffoldSnackBarHost(
+        screenStatus = screenStatus,
+        modifier = modifier,
+        showLoadingDialog = showLoadingDialog,
+        onRefresh = onRefresh,
+        isRefreshing = isRefreshing,
+        topBar = topBar,
+        snackBarState = viewModel.snackBarState,
+        errorState = viewModel.errorState,
+        horizontalPadding = horizontalPadding,
+        floatingActionButton = floatingActionButton,
+        floatingActionButtonPosition = floatingActionButtonPosition,
+        containerColor = containerColor,
+        contentColor = contentColor,
+        contentWindowInsets = contentWindowInsets,
+        content = content
+    )
+}
+
+@Composable
+private fun <T : Any> DTScaffoldSnackBarHost(
+    screenStatus: ScreenStatus<T>,
+    modifier: Modifier = Modifier,
+    errorState: SharedFlow<String>,
+    showLoadingDialog: Boolean = false,
+    snackBarState: SharedFlow<String>,
+    onRefresh: () -> Unit = {},
+    isRefreshing: Boolean = false,
     horizontalPadding: Dp = 8.dp,
     topBar: DTTopAppBar? = null,
     floatingActionButton: @Composable () -> Unit = {},
@@ -53,12 +96,10 @@ fun <T : Any> DTScaffold(
     content: @Composable BoxScope.(T) -> Unit
 ) {
     val snackBarHostState = remember { SnackbarHostState() }
-    val screenStatus by viewModel.screenStatus.collectAsStateWithLifecycle()
-    val showLoadingDialog by viewModel.showLoadingDialog.collectAsStateWithLifecycle()
-
     val coroutineScope = rememberCoroutineScope()
+
     LaunchedEffect(Unit) {
-        viewModel.errorState.collectLatest { error ->
+        errorState.collectLatest { error ->
             coroutineScope.launch {
                 snackBarHostState.showSnackbar(error)
             }
@@ -66,15 +107,57 @@ fun <T : Any> DTScaffold(
     }
 
     LaunchedEffect(Unit) {
-        viewModel.snackBarState.collectLatest { snackBar ->
+        snackBarState.collectLatest { snackBar ->
             coroutineScope.launch {
                 snackBarHostState.showSnackbar(snackBar)
             }
         }
     }
 
-    Scaffold(
+    DTScaffoldTopAppBar(
+        screenStatus = screenStatus,
         modifier = modifier,
+        showLoadingDialog = showLoadingDialog,
+        onRefresh = onRefresh,
+        isRefreshing = isRefreshing,
+        topBar = topBar,
+        snackbarHost = {
+            SnackbarHost(hostState = snackBarHostState)
+        },
+        horizontalPadding = horizontalPadding,
+        floatingActionButton = floatingActionButton,
+        floatingActionButtonPosition = floatingActionButtonPosition,
+        containerColor = containerColor,
+        contentColor = contentColor,
+        contentWindowInsets = contentWindowInsets,
+        content = content
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun <T : Any> DTScaffoldTopAppBar(
+    screenStatus: ScreenStatus<T>,
+    modifier: Modifier = Modifier,
+    showLoadingDialog: Boolean = false,
+    onRefresh: (() -> Unit)? = null,
+    isRefreshing: Boolean = false,
+    horizontalPadding: Dp = 8.dp,
+    topBar: DTTopAppBar? = null,
+    snackbarHost: @Composable () -> Unit,
+    floatingActionButton: @Composable () -> Unit = {},
+    floatingActionButtonPosition: FabPosition = FabPosition.End,
+    containerColor: Color = MaterialTheme.colorScheme.background,
+    contentColor: Color = contentColorFor(containerColor),
+    contentWindowInsets: WindowInsets = ScaffoldDefaults.contentWindowInsets,
+    content: @Composable BoxScope.(T) -> Unit
+) {
+    DTScaffoldPullToRefresh(
+        screenStatus = screenStatus,
+        modifier = modifier,
+        showLoadingDialog = showLoadingDialog,
+        onRefresh = onRefresh,
+        isRefreshing = isRefreshing,
         topBar = {
             if (topBar != null) {
                 TopAppBar(
@@ -98,55 +181,102 @@ fun <T : Any> DTScaffold(
                 )
             }
         },
+        snackbarHost = snackbarHost,
+        horizontalPadding = horizontalPadding,
         floatingActionButton = floatingActionButton,
         floatingActionButtonPosition = floatingActionButtonPosition,
-        snackbarHost = {
-            SnackbarHost(hostState = snackBarHostState)
-        },
+        containerColor = containerColor,
+        contentColor = contentColor,
+        contentWindowInsets = contentWindowInsets,
+        content = content
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun <T : Any> DTScaffoldPullToRefresh(
+    screenStatus: ScreenStatus<T>,
+    modifier: Modifier = Modifier,
+    showLoadingDialog: Boolean = false,
+    onRefresh: (() -> Unit)? = null,
+    isRefreshing: Boolean = false,
+    topBar: @Composable () -> Unit = {},
+    snackbarHost: @Composable () -> Unit,
+    horizontalPadding: Dp = 8.dp,
+    floatingActionButton: @Composable () -> Unit = {},
+    floatingActionButtonPosition: FabPosition = FabPosition.End,
+    containerColor: Color = MaterialTheme.colorScheme.background,
+    contentColor: Color = contentColorFor(containerColor),
+    contentWindowInsets: WindowInsets = ScaffoldDefaults.contentWindowInsets,
+    content: @Composable (BoxScope.(T) -> Unit)
+) {
+    Scaffold(
+        modifier = modifier,
+        topBar = topBar,
+        floatingActionButton = floatingActionButton,
+        floatingActionButtonPosition = floatingActionButtonPosition,
+        snackbarHost = snackbarHost,
         containerColor = containerColor,
         contentColor = contentColor,
         contentWindowInsets = contentWindowInsets
     ) {
-        Box(
+        PullToRefreshBox(
+            isRefreshing = onRefresh != null && isRefreshing,
+            onRefresh = {
+                onRefresh?.invoke()
+            },
             modifier = Modifier
                 .padding(horizontal = horizontalPadding)
                 .padding(top = it.calculateTopPadding())
                 .fillMaxSize()
         ) {
-            when (val status = screenStatus) {
-                is ScreenStatus.LoadingFullScreen -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator()
-                    }
-                }
+            DTScaffoldContent(screenStatus, content, showLoadingDialog)
+        }
+    }
+}
 
-                is ScreenStatus.Success -> {
-                    content(this, status.value)
-                }
-
-                is ScreenStatus.ErrorFullScreen -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(text = status.error)
-                    }
-                }
+@Composable
+private fun <T : Any> BoxScope.DTScaffoldContent(
+    screenStatus: ScreenStatus<T>,
+    content: @Composable (BoxScope.(T) -> Unit),
+    showLoadingDialog: Boolean
+) {
+    when (screenStatus) {
+        is ScreenStatus.LoadingFullScreen -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
             }
+        }
 
-            if (showLoadingDialog) {
-                Dialog(onDismissRequest = {}) {
-                    Card {
-                        CircularProgressIndicator(
-                            modifier = Modifier
-                                .padding(16.dp)
-                                .align(Alignment.CenterHorizontally)
-                        )
-                    }
-                }
+        is ScreenStatus.Success -> {
+            content(this, screenStatus.value)
+        }
+
+        is ScreenStatus.ErrorFullScreen -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(text = screenStatus.error)
+            }
+        }
+
+        else -> {
+            /* no-op */
+        }
+    }
+
+    if (showLoadingDialog) {
+        Dialog(onDismissRequest = {}) {
+            Card {
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .align(Alignment.CenterHorizontally)
+                )
             }
         }
     }

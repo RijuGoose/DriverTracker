@@ -19,15 +19,15 @@ class TripHistoryViewModel @Inject constructor(
     @ApplicationContext private val context: Context
 ) : BaseViewModel<List<TripHistoryItemUIModel>>() {
     init {
-        getTripHistoryByStartTime()
+        getTripHistory()
     }
 
-    private fun getTripHistoryByStartTime() {
+    fun getTripHistory() {
         viewModelScope.launch {
-            _screenStatus.value = ScreenStatus.LoadingFullScreen
+            showPullToRefresh()
             try {
                 val tripHistory =
-                    tripHistoryRepository.getAllTripHistory()?.map {
+                    tripHistoryRepository.getAllTripHistory().map {
                         TripHistoryItemUIModel(
                             tripId = it.tripId,
                             startTime = LocalDateTime.parse(it.startTime),
@@ -35,8 +35,9 @@ class TripHistoryViewModel @Inject constructor(
                             startLocation = it.startLocation,
                             endLocation = it.endLocation
                         )
-                    } ?: emptyList()
+                    }
                 _screenStatus.value = ScreenStatus.Success(tripHistory)
+                hidePullToRefresh()
             } catch (e: Exception) {
                 _screenStatus.value = ScreenStatus.ErrorFullScreen(
                     error = e.message ?: context.getString(R.string.common_unknown_error)
