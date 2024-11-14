@@ -6,7 +6,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.getValue
-import com.riju.remotedatasourceimpl.model.DatabaseConstants
+import com.riju.domain.model.common.DatabaseConstants
 import com.riju.remotedatasourceimpl.model.routepoint.RoutePointRequest
 import com.riju.remotedatasourceimpl.model.routepoint.RoutePointResponse
 import com.riju.remotedatasourceimpl.model.tripdetails.TripDetailsRequest
@@ -22,28 +22,28 @@ class RemoteTrackingDataSourceImpl @Inject constructor(
 ) : RemoteTrackingDataSource {
     override fun addTripDetails(user: FirebaseUser, tripId: String, tripDetails: TripDetailsRequest) {
         database
-            .child(DatabaseConstants.LIST_USERS)
+            .child(DatabaseConstants.List.Users.listName)
             .child(user.uid)
-            .child(DatabaseConstants.LIST_TRIPS)
+            .child(DatabaseConstants.List.Trips.listName)
             .child(tripId)
             .setValue(tripDetails)
     }
 
     override fun modifyEndTime(user: FirebaseUser, tripId: String, endTime: String) {
         database
-            .child(DatabaseConstants.LIST_USERS)
+            .child(DatabaseConstants.List.Users.listName)
             .child(user.uid)
-            .child(DatabaseConstants.LIST_TRIPS)
+            .child(DatabaseConstants.List.Trips.listName)
             .child(tripId)
-            .child(DatabaseConstants.FIELD_END_TIME)
+            .child(DatabaseConstants.Field.EndTime.fieldName)
             .setValue(endTime)
     }
 
     override fun addRoutePoint(user: FirebaseUser, tripId: String, pointCount: Int, routePoint: RoutePointRequest) {
         database
-            .child(DatabaseConstants.LIST_USERS)
+            .child(DatabaseConstants.List.Users.listName)
             .child(user.uid)
-            .child(DatabaseConstants.LIST_TRIP_LOCATIONS)
+            .child(DatabaseConstants.List.TripLocations.listName)
             .child(tripId)
             .child(pointCount.toString())
             .setValue(routePoint)
@@ -51,9 +51,9 @@ class RemoteTrackingDataSourceImpl @Inject constructor(
 
     override suspend fun getAllTripHistory(user: FirebaseUser, orderBy: String): List<TripDetailsResponse> {
         return database
-            .child(DatabaseConstants.LIST_USERS)
+            .child(DatabaseConstants.List.Users.listName)
             .child(user.uid)
-            .child(DatabaseConstants.LIST_TRIPS)
+            .child(DatabaseConstants.List.Trips.listName)
             .orderByChild(orderBy)
             .get()
             .await().children.map { dataSnapshot ->
@@ -68,18 +68,18 @@ class RemoteTrackingDataSourceImpl @Inject constructor(
         tripId: String
     ): List<RoutePointResponse>? {
         return database
-            .child(DatabaseConstants.LIST_USERS)
+            .child(DatabaseConstants.List.Users.listName)
             .child(user.uid)
-            .child(DatabaseConstants.LIST_TRIP_LOCATIONS)
+            .child(DatabaseConstants.List.TripLocations.listName)
             .child(tripId)
             .get().await().getValue<List<RoutePointResponse>>()
     }
 
     override suspend fun getTripDetails(user: FirebaseUser, tripId: String): TripDetailsResponse? {
         return database
-            .child(DatabaseConstants.LIST_USERS)
+            .child(DatabaseConstants.List.Users.listName)
             .child(user.uid)
-            .child(DatabaseConstants.LIST_TRIPS)
+            .child(DatabaseConstants.List.Trips.listName)
             .child(tripId)
             .get().await().getValue<TripDetailsResponse>()
     }
@@ -97,9 +97,9 @@ class RemoteTrackingDataSourceImpl @Inject constructor(
             }
 
             database
-                .child(DatabaseConstants.LIST_USERS)
+                .child(DatabaseConstants.List.Users.listName)
                 .child(user.uid)
-                .child(DatabaseConstants.LIST_TRIP_LOCATIONS)
+                .child(DatabaseConstants.List.TripLocations.listName)
                 .child(tripId)
                 .addValueEventListener(tripListener)
 

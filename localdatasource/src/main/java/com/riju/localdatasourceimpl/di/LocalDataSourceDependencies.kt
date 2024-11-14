@@ -1,6 +1,7 @@
 package com.riju.localdatasourceimpl.di
 
 import android.content.Context
+import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.DataStoreFactory
 import androidx.datastore.dataStoreFile
@@ -17,6 +18,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import java.util.concurrent.Executors
 import javax.inject.Singleton
 
 @Module
@@ -51,7 +53,8 @@ abstract class LocalDataSourceDependencies {
                 context = context,
                 klass = AppDatabase::class.java,
                 name = "tracker_db"
-            ).build()
+            ).setQueryCallback({ sql, _ -> Log.d("Room query", sql) }, Executors.newSingleThreadExecutor())
+                .build()
 
         @Provides
         @Singleton

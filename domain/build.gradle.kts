@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.riju.repository"
+    namespace = "com.riju.domain"
     compileSdk = 34
 
     defaultConfig {
@@ -28,10 +28,6 @@ android {
 }
 
 dependencies {
-    implementation(project(":domain"))
-
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.auth)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

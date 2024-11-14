@@ -1,9 +1,9 @@
 package com.riju.repositoryimpl
 
+import com.riju.domain.model.common.DatabaseConstants
 import com.riju.localdatasourceimpl.LocalTrackingDataSource
 import com.riju.remotedatasourceimpl.RemoteTrackingDataSource
 import com.riju.remotedatasourceimpl.UserDataSource
-import com.riju.remotedatasourceimpl.model.DatabaseConstants
 import com.riju.repository.TripHistoryRepository
 import com.riju.repository.model.TrackingPoint
 import com.riju.repository.model.TripDetails
@@ -14,9 +14,9 @@ class TripHistoryRepositoryImpl @Inject constructor(
     private val localTrackingDataSource: LocalTrackingDataSource,
     private val userDataSource: UserDataSource
 ) : TripHistoryRepository {
-    override suspend fun getAllTripHistory(): List<TripDetails> {
+    override suspend fun getAllTripHistory(orderBy: DatabaseConstants.Field, isAscending: Boolean): List<TripDetails> {
         return userDataSource.getUser()?.let { currentUser ->
-            remoteTrackingDataSource.getAllTripHistory(currentUser, DatabaseConstants.FIELD_START_TIME)
+            remoteTrackingDataSource.getAllTripHistory(currentUser, orderBy.fieldName) // TODO isAscending
                 .map { tripDetails ->
                     TripDetails(
                         tripId = tripDetails.tripId,
@@ -26,7 +26,7 @@ class TripHistoryRepositoryImpl @Inject constructor(
                         endLocation = tripDetails.endLocation,
                     )
                 }
-        } ?: localTrackingDataSource.getAllTripHistory().map { tripEntity ->
+        } ?: localTrackingDataSource.getAllTripHistory(orderBy.fieldName, isAscending).map { tripEntity ->
             TripDetails(
                 tripId = tripEntity.tripId,
                 startTime = tripEntity.startTime,

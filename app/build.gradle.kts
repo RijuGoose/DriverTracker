@@ -66,6 +66,7 @@ dependencies {
     implementation(project(":repositoryimpl"))
     implementation(project(":localdatasource"))
     implementation(project(":remotedatasource"))
+    implementation(project(":domain"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

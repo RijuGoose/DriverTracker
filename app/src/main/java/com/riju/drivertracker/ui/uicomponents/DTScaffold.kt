@@ -174,7 +174,11 @@ private fun <T : Any> DTScaffoldTopAppBar(
                     actions = {
                         topBar.actionButtons?.forEach { actionButton ->
                             IconButton(onClick = actionButton.onClick::invoke) {
-                                Icon(actionButton.icon, contentDescription = actionButton.contentDescription)
+                                Icon(
+                                    imageVector = actionButton.icon.icon,
+                                    modifier = actionButton.icon.modifier,
+                                    contentDescription = actionButton.contentDescription
+                                )
                             }
                         }
                     }

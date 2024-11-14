@@ -33,6 +33,7 @@ dependencies {
     implementation(project(":repository"))
     implementation(project(":remotedatasource"))
     implementation(project(":localdatasource"))
+    implementation(project(":domain"))
 
     implementation(libs.play.services.location)
     implementation(libs.hilt.android)

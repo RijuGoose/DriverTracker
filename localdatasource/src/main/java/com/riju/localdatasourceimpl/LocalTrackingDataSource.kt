@@ -9,7 +9,7 @@ interface LocalTrackingDataSource {
     fun addRoutePoint(routePoint: RoutePointEntity)
     fun getTripPointsFlow(tripId: String): Flow<List<RoutePointEntity>?>
     suspend fun modifyEndTime(tripId: String, endTime: String)
-    suspend fun getAllTripHistory(): List<TripEntity>
+    suspend fun getAllTripHistory(orderBy: String, isAscending: Boolean): List<TripEntity>
     suspend fun getTripPoints(tripId: String): List<RoutePointEntity>
     suspend fun getTripDetails(tripId: String): TripEntity?
 }
