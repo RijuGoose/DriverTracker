@@ -6,6 +6,6 @@ import kotlinx.serialization.Serializable
 abstract class TripDetailsApiModel {
     abstract val startTime: String
     abstract val endTime: String?
-    abstract val startLocation: String
+    abstract val startLocation: String?
     abstract val endLocation: String?
 }

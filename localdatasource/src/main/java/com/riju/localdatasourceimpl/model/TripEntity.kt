@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 data class TripEntity(
     @PrimaryKey val tripId: String,
     val startTime: String,
-    val startLocation: String,
+    val startLocation: String? = null,
     val endTime: String? = null,
     val endLocation: String? = null,
 )

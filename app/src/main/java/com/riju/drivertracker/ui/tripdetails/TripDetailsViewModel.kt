@@ -13,6 +13,7 @@ import com.riju.drivertracker.R
 import com.riju.drivertracker.ui.BaseViewModel
 import com.riju.drivertracker.ui.ScreenStatus
 import com.riju.drivertracker.ui.navigation.Screen
+import com.riju.repository.LocationRepository
 import com.riju.repository.TripHistoryRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -26,7 +27,8 @@ import javax.inject.Inject
 @HiltViewModel
 class TripDetailsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    tripHistoryRepository: TripHistoryRepository,
+    private val tripHistoryRepository: TripHistoryRepository,
+    private val locationRepository: LocationRepository,
     @ApplicationContext private val context: Context
 ) : BaseViewModel<TripDetailsUiModel>(defaultScreenState = ScreenStatus.LoadingFullScreen) {
     private val tripId = savedStateHandle.toRoute<Screen.TripDetails>().tripId
@@ -43,7 +45,12 @@ class TripDetailsViewModel @Inject constructor(
     val mapBounds = _mapBounds.asStateFlow()
 
     init {
+        loadTripDetails()
+    }
+
+    private fun loadTripDetails() {
         viewModelScope.launch {
+            _screenStatus.value = ScreenStatus.LoadingFullScreen
             try {
                 val tripDetails = tripHistoryRepository.getTripDetails(tripId)
                 val tripRoute = tripHistoryRepository.getTripHistoryRouteById(tripId)
@@ -71,8 +78,8 @@ class TripDetailsViewModel @Inject constructor(
                             distance = 0.0, // TODO how to get it
                             startTime = LocalDateTime.parse(tripDetails?.startTime),
                             endTime = tripDetails?.endTime?.let { endTime -> LocalDateTime.parse(endTime) },
-                            startLocation = tripDetails?.startLocation ?: "-",
-                            endLocation = tripDetails?.endLocation ?: "-"
+                            startLocation = tripDetails?.startLocation,
+                            endLocation = tripDetails?.endLocation
                         )
                     )
                 } ?: run {
@@ -134,5 +141,47 @@ class TripDetailsViewModel @Inject constructor(
 
         // Calculate the speed from the ratio
         return minSpeed + (ratio * (maxSpeed - minSpeed))
+    }
+
+    fun getEndLocation() {
+        viewModelScope.launch {
+            try {
+                val address = locationRepository.getLocationAddress(
+                    lat = _tripPoints.value.last().first.latitude,
+                    lon = _tripPoints.value.last().first.longitude
+                )
+
+                if (address != null) {
+                    tripHistoryRepository.modifyEndLocation(
+                        tripId = tripId,
+                        endLocation = address.locality + ", " + address.thoroughfare
+                    )
+                }
+                loadTripDetails()
+            } catch (ex: Exception) {
+                showSnackBar("Error while getting location")
+            }
+        }
+    }
+
+    fun getStartLocation() {
+        viewModelScope.launch {
+            try {
+                val address = locationRepository.getLocationAddress(
+                    lat = _tripPoints.value.first().first.latitude,
+                    lon = _tripPoints.value.first().first.longitude
+                )
+
+                if (address != null) {
+                    tripHistoryRepository.modifyStartLocation(
+                        tripId = tripId,
+                        startLocation = address.locality + ", " + address.thoroughfare
+                    )
+                }
+                loadTripDetails()
+            } catch (ex: Exception) {
+                showSnackBar("Error while getting location")
+            }
+        }
     }
 }

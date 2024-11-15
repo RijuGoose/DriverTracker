@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,16 +18,25 @@ import com.riju.drivertracker.ui.theme.DriverTrackerTheme
 @Composable
 fun TripDetailCard(
     cardTitle: String,
-    cardValue: String,
-    modifier: Modifier = Modifier
+    cardValue: String?,
+    modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null
 ) {
     Card(modifier = modifier) {
         Column(
-            modifier = Modifier.padding(8.dp).align(Alignment.CenterHorizontally),
+            modifier = Modifier
+                .padding(8.dp)
+                .align(Alignment.CenterHorizontally),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(text = cardTitle, fontWeight = FontWeight.Bold)
-            Text(text = cardValue, textAlign = TextAlign.Center)
+            if (onClick != null && cardValue == null) {
+                TextButton(onClick = onClick) {
+                    Text(text = "Click here to get data", textAlign = TextAlign.Center)
+                }
+            } else {
+                Text(text = cardValue ?: "-", textAlign = TextAlign.Center)
+            }
         }
     }
 }

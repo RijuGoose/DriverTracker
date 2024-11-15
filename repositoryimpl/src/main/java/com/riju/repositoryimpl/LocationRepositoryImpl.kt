@@ -3,6 +3,8 @@ package com.riju.repositoryimpl
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.location.Address
+import android.location.Geocoder
 import android.location.Location
 import android.location.LocationManager
 import android.os.Looper
@@ -25,10 +27,13 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class LocationRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val client: FusedLocationProviderClient
+    private val client: FusedLocationProviderClient,
+    private val geocoder: Geocoder
 ) : LocationRepository {
 
     override fun getLocationUpdates(interval: Long): Flow<UserPermissionState<Location>> {
@@ -114,5 +119,25 @@ class LocationRepositoryImpl @Inject constructor(
         return UserPermissionState.Granted(
             client.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, cancellationToken).await()
         )
+    }
+
+    override suspend fun getLocationAddress(lat: Double, lon: Double): Address? {
+        return if (Geocoder.isPresent()) {
+            suspendCoroutine { continuation ->
+                geocoder.getFromLocation(
+                    lat,
+                    lon,
+                    1
+                ) { addresses ->
+                    if (addresses.isNotEmpty()) {
+                        continuation.resume(addresses[0])
+                    } else {
+                        continuation.resume(null)
+                    }
+                }
+            }
+        } else {
+            null
+        }
     }
 }

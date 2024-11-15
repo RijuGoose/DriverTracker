@@ -76,4 +76,16 @@ class TripHistoryRepositoryImpl @Inject constructor(
             )
         }
     }
+
+    override suspend fun modifyStartLocation(tripId: String, startLocation: String) {
+        userDataSource.getUser()?.let { currentUser ->
+            remoteTrackingDataSource.modifyStartLocation(currentUser, tripId, startLocation)
+        } ?: localTrackingDataSource.modifyStartLocation(tripId, startLocation)
+    }
+
+    override suspend fun modifyEndLocation(tripId: String, endLocation: String) {
+        userDataSource.getUser()?.let { currentUser ->
+            remoteTrackingDataSource.modifyEndLocation(currentUser, tripId, endLocation)
+        } ?: localTrackingDataSource.modifyEndLocation(tripId, endLocation)
+    }
 }

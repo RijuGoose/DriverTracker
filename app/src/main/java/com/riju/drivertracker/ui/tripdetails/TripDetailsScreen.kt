@@ -138,12 +138,14 @@ fun TripDetailsScreen(
                     TripDetailCard(
                         modifier = Modifier.weight(1f),
                         cardTitle = stringResource(R.string.trip_details_start_location),
-                        cardValue = uiModel.startLocation
+                        cardValue = uiModel.startLocation,
+                        onClick = viewModel::getStartLocation
                     )
                     TripDetailCard(
                         modifier = Modifier.weight(1f),
                         cardTitle = stringResource(R.string.trip_details_end_location),
-                        cardValue = uiModel.endLocation ?: "-"
+                        cardValue = uiModel.endLocation,
+                        onClick = viewModel::getEndLocation
                     )
                 }
             }

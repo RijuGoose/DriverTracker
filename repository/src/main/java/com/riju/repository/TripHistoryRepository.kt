@@ -8,4 +8,6 @@ interface TripHistoryRepository {
     suspend fun getAllTripHistory(orderBy: DatabaseConstants.Field, isAscending: Boolean = false): List<TripDetails>
     suspend fun getTripHistoryRouteById(tripId: String): List<TrackingPoint>?
     suspend fun getTripDetails(tripId: String): TripDetails?
+    suspend fun modifyStartLocation(tripId: String, startLocation: String)
+    suspend fun modifyEndLocation(tripId: String, endLocation: String)
 }

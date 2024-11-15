@@ -15,6 +15,7 @@ import com.riju.localdatasourceimpl.model.TripRoutePoints
 import kotlinx.coroutines.flow.Flow
 
 @Dao
+@Suppress("TooManyFunctions")
 interface TripDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertTrip(trip: TripEntity)
@@ -46,4 +47,10 @@ interface TripDao {
 
     @Query("UPDATE trips SET endTime = :endTime WHERE tripId = :tripId")
     suspend fun updateTripEndTime(tripId: String, endTime: String)
+
+    @Query("UPDATE trips SET startLocation = :startLocation WHERE tripId = :tripId")
+    suspend fun updateTripStartLocation(tripId: String, startLocation: String)
+
+    @Query("UPDATE trips SET endLocation = :endLocation WHERE tripId = :tripId")
+    suspend fun updateTripEndLocation(tripId: String, endLocation: String)
 }

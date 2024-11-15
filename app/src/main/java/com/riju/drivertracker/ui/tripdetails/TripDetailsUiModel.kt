@@ -8,6 +8,6 @@ data class TripDetailsUiModel(
     val distance: Double,
     val startTime: LocalDateTime,
     val endTime: LocalDateTime? = null,
-    val startLocation: String,
+    val startLocation: String? = null,
     val endLocation: String? = null
 )

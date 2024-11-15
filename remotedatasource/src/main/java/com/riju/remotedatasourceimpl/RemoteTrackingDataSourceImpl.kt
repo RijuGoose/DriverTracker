@@ -39,6 +39,26 @@ class RemoteTrackingDataSourceImpl @Inject constructor(
             .setValue(endTime)
     }
 
+    override suspend fun modifyStartLocation(user: FirebaseUser, tripId: String, startLocation: String) {
+        database
+            .child(DatabaseConstants.List.Users.listName)
+            .child(user.uid)
+            .child(DatabaseConstants.List.Trips.listName)
+            .child(tripId)
+            .child(DatabaseConstants.Field.StartLocation.fieldName)
+            .setValue(startLocation)
+    }
+
+    override suspend fun modifyEndLocation(user: FirebaseUser, tripId: String, endLocation: String) {
+        database
+            .child(DatabaseConstants.List.Users.listName)
+            .child(user.uid)
+            .child(DatabaseConstants.List.Trips.listName)
+            .child(tripId)
+            .child(DatabaseConstants.Field.EndLocation.fieldName)
+            .setValue(endLocation)
+    }
+
     override fun addRoutePoint(user: FirebaseUser, tripId: String, pointCount: Int, routePoint: RoutePointRequest) {
         database
             .child(DatabaseConstants.List.Users.listName)

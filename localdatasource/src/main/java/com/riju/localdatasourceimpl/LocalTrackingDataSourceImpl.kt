@@ -32,6 +32,14 @@ class LocalTrackingDataSourceImpl @Inject constructor(
         return tripDao.getAllTripHistory(orderBy, isAscending)
     }
 
+    override suspend fun modifyStartLocation(tripId: String, startLocation: String) {
+        tripDao.updateTripStartLocation(tripId, startLocation)
+    }
+
+    override suspend fun modifyEndLocation(tripId: String, endLocation: String) {
+        tripDao.updateTripEndLocation(tripId, endLocation)
+    }
+
     override suspend fun getTripPoints(tripId: String): List<RoutePointEntity> {
         return tripDao.getTripRoute(tripId).routePoints
     }

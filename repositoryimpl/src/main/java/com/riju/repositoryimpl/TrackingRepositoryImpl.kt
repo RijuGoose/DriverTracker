@@ -22,7 +22,7 @@ import javax.inject.Inject
 class TrackingRepositoryImpl @Inject constructor(
     private val remoteTrackingDataSource: RemoteTrackingDataSource,
     private val localTrackingDataSource: LocalTrackingDataSource,
-    private val userDataSource: UserDataSource
+    private val userDataSource: UserDataSource,
 ) : TrackingRepository {
     private val currentTripId: MutableStateFlow<String?> = MutableStateFlow(null)
     private var currentTripCounter: Int = 0
@@ -37,15 +37,13 @@ class TrackingRepositoryImpl @Inject constructor(
                 user = currentUser,
                 tripId = requireNotNull(currentTripId.value),
                 tripDetails = TripDetailsRequest(
-                    startTime = LocalDateTime.now().toString(),
-                    startLocation = "Start Location", // TODO get address somehow
+                    startTime = LocalDateTime.now().toString()
                 )
             )
         } ?: localTrackingDataSource.addTrip(
             trip = TripEntity(
                 tripId = requireNotNull(currentTripId.value),
-                startTime = LocalDateTime.now().toString(),
-                startLocation = "Start Location" // TODO get address somehow
+                startTime = LocalDateTime.now().toString()
             )
         )
     }
