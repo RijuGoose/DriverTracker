@@ -98,6 +98,7 @@ class TripDetailsViewModel @Inject constructor(
         const val CAMERA_PADDING = 100
     }
 
+    // TODO refact these two functions
     @Suppress("MagicNumber")
     fun getColorForSpeed(speed: Double, minSpeed: Double = 0.0, maxSpeed: Double = 200.0): Color {
         val clampedSpeed = speed.coerceIn(minSpeed, maxSpeed)

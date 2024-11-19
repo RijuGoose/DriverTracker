@@ -32,6 +32,7 @@ fun TripHistoryScreen(
     val isOrderAscending by viewModel.isOrderAscending.collectAsState()
     DTScaffold(
         viewModel = viewModel,
+        horizontalPadding = 0.dp,
         topBar = DTTopAppBar(
             title = stringResource(R.string.trip_history_top_bar_title),
             actionButtons = listOf(

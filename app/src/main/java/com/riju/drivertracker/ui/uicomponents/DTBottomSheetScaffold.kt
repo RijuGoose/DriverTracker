@@ -1,24 +1,25 @@
 package com.riju.drivertracker.ui.uicomponents
 
 import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.BottomSheetDefaults
+import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.contentColorFor
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -26,6 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -36,25 +38,24 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @Composable
-fun <T : Any> DTScaffold(
+fun <T : Any> DTBottomSheetScaffold(
     viewModel: BaseViewModel<T>,
+    sheetContent: @Composable ColumnScope.(T) -> Unit,
     modifier: Modifier = Modifier,
     onRefresh: () -> Unit = {},
     horizontalPadding: Dp = 8.dp,
     topBar: DTTopAppBar? = null,
-    floatingActionButton: @Composable () -> Unit = {},
-    floatingActionButtonPosition: FabPosition = FabPosition.End,
     containerColor: Color = MaterialTheme.colorScheme.background,
     contentColor: Color = contentColorFor(containerColor),
-    contentWindowInsets: WindowInsets = ScaffoldDefaults.contentWindowInsets,
     content: @Composable BoxScope.(T) -> Unit
 ) {
     val screenStatus by viewModel.screenStatus.collectAsStateWithLifecycle()
     val showLoadingDialog by viewModel.showLoadingDialog.collectAsStateWithLifecycle()
     val isRefreshing by viewModel.showPullToRefresh.collectAsStateWithLifecycle()
 
-    DTScaffoldSnackBarHost(
+    DTBottomSheetScaffoldSnackBarHost(
         screenStatus = screenStatus,
+        sheetContent = sheetContent,
         modifier = modifier,
         showLoadingDialog = showLoadingDialog,
         onRefresh = onRefresh,
@@ -63,18 +64,16 @@ fun <T : Any> DTScaffold(
         snackBarState = viewModel.snackBarState,
         errorState = viewModel.errorState,
         horizontalPadding = horizontalPadding,
-        floatingActionButton = floatingActionButton,
-        floatingActionButtonPosition = floatingActionButtonPosition,
         containerColor = containerColor,
         contentColor = contentColor,
-        contentWindowInsets = contentWindowInsets,
         content = content
     )
 }
 
 @Composable
-private fun <T : Any> DTScaffoldSnackBarHost(
+private fun <T : Any> DTBottomSheetScaffoldSnackBarHost(
     screenStatus: ScreenStatus<T>,
+    sheetContent: @Composable (ColumnScope.(T) -> Unit),
     modifier: Modifier = Modifier,
     errorState: SharedFlow<String>,
     showLoadingDialog: Boolean = false,
@@ -83,11 +82,8 @@ private fun <T : Any> DTScaffoldSnackBarHost(
     isRefreshing: Boolean = false,
     horizontalPadding: Dp = 8.dp,
     topBar: DTTopAppBar? = null,
-    floatingActionButton: @Composable () -> Unit = {},
-    floatingActionButtonPosition: FabPosition = FabPosition.End,
     containerColor: Color = MaterialTheme.colorScheme.background,
     contentColor: Color = contentColorFor(containerColor),
-    contentWindowInsets: WindowInsets = ScaffoldDefaults.contentWindowInsets,
     content: @Composable BoxScope.(T) -> Unit
 ) {
     val snackBarHostState = remember { SnackbarHostState() }
@@ -109,46 +105,43 @@ private fun <T : Any> DTScaffoldSnackBarHost(
         }
     }
 
-    DTScaffoldTopAppBar(
+    DTBottomSheetScaffoldTopAppBar(
         screenStatus = screenStatus,
+        sheetContent = sheetContent,
         modifier = modifier,
         showLoadingDialog = showLoadingDialog,
         onRefresh = onRefresh,
         isRefreshing = isRefreshing,
+        horizontalPadding = horizontalPadding,
         topBar = topBar,
         snackbarHost = {
             SnackbarHost(hostState = snackBarHostState)
         },
-        horizontalPadding = horizontalPadding,
-        floatingActionButton = floatingActionButton,
-        floatingActionButtonPosition = floatingActionButtonPosition,
         containerColor = containerColor,
         contentColor = contentColor,
-        contentWindowInsets = contentWindowInsets,
-        content = content
+        content = content,
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun <T : Any> DTScaffoldTopAppBar(
+private fun <T : Any> DTBottomSheetScaffoldTopAppBar(
     screenStatus: ScreenStatus<T>,
+    sheetContent: @Composable (ColumnScope.(T) -> Unit),
     modifier: Modifier = Modifier,
     showLoadingDialog: Boolean = false,
     onRefresh: (() -> Unit)? = null,
     isRefreshing: Boolean = false,
     horizontalPadding: Dp = 8.dp,
     topBar: DTTopAppBar? = null,
-    snackbarHost: @Composable () -> Unit,
-    floatingActionButton: @Composable () -> Unit = {},
-    floatingActionButtonPosition: FabPosition = FabPosition.End,
+    snackbarHost: @Composable (SnackbarHostState) -> Unit,
     containerColor: Color = MaterialTheme.colorScheme.background,
     contentColor: Color = contentColorFor(containerColor),
-    contentWindowInsets: WindowInsets = ScaffoldDefaults.contentWindowInsets,
-    content: @Composable BoxScope.(T) -> Unit
+    content: @Composable (BoxScope.(T) -> Unit),
 ) {
-    DTScaffoldPullToRefresh(
+    DTBottomSheetScaffoldPullToRefresh(
         screenStatus = screenStatus,
+        sheetContent = sheetContent,
         modifier = modifier,
         showLoadingDialog = showLoadingDialog,
         onRefresh = onRefresh,
@@ -182,42 +175,63 @@ private fun <T : Any> DTScaffoldTopAppBar(
         },
         snackbarHost = snackbarHost,
         horizontalPadding = horizontalPadding,
-        floatingActionButton = floatingActionButton,
-        floatingActionButtonPosition = floatingActionButtonPosition,
         containerColor = containerColor,
         contentColor = contentColor,
-        contentWindowInsets = contentWindowInsets,
         content = content
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun <T : Any> DTScaffoldPullToRefresh(
+fun <T : Any> DTBottomSheetScaffoldPullToRefresh(
     screenStatus: ScreenStatus<T>,
+    sheetContent: @Composable (ColumnScope.(T) -> Unit),
     modifier: Modifier = Modifier,
+    scaffoldState: BottomSheetScaffoldState = rememberBottomSheetScaffoldState(),
+    sheetPeekHeight: Dp = BottomSheetDefaults.SheetPeekHeight,
+    sheetMaxWidth: Dp = BottomSheetDefaults.SheetMaxWidth,
+    sheetShape: Shape = BottomSheetDefaults.ExpandedShape,
+    sheetContainerColor: Color = BottomSheetDefaults.ContainerColor,
+    sheetContentColor: Color = contentColorFor(sheetContainerColor),
+    sheetTonalElevation: Dp = 0.dp,
+    sheetShadowElevation: Dp = BottomSheetDefaults.Elevation,
+    sheetDragHandle: @Composable (() -> Unit)? = { BottomSheetDefaults.DragHandle() },
+    sheetSwipeEnabled: Boolean = true,
     showLoadingDialog: Boolean = false,
     onRefresh: (() -> Unit)? = null,
     isRefreshing: Boolean = false,
     topBar: @Composable () -> Unit = {},
-    snackbarHost: @Composable () -> Unit,
+    snackbarHost: @Composable (SnackbarHostState) -> Unit,
     horizontalPadding: Dp = 8.dp,
-    floatingActionButton: @Composable () -> Unit = {},
-    floatingActionButtonPosition: FabPosition = FabPosition.End,
     containerColor: Color = MaterialTheme.colorScheme.background,
     contentColor: Color = contentColorFor(containerColor),
-    contentWindowInsets: WindowInsets = ScaffoldDefaults.contentWindowInsets,
     content: @Composable (BoxScope.(T) -> Unit)
 ) {
-    Scaffold(
+    BottomSheetScaffold(
         modifier = modifier,
+        sheetContent = {
+            when (screenStatus) {
+                is ScreenStatus.Success -> {
+                    sheetContent(this, screenStatus.value)
+                }
+                else -> {
+                    /* no-op */
+                }
+            }
+        },
         topBar = topBar,
-        floatingActionButton = floatingActionButton,
-        floatingActionButtonPosition = floatingActionButtonPosition,
+        scaffoldState = scaffoldState,
+        sheetPeekHeight = sheetPeekHeight,
+        sheetMaxWidth = sheetMaxWidth,
+        sheetShape = sheetShape,
+        sheetContentColor = sheetContentColor,
+        sheetTonalElevation = sheetTonalElevation,
+        sheetShadowElevation = sheetShadowElevation,
+        sheetDragHandle = sheetDragHandle,
+        sheetSwipeEnabled = sheetSwipeEnabled,
         snackbarHost = snackbarHost,
         containerColor = containerColor,
         contentColor = contentColor,
-        contentWindowInsets = contentWindowInsets
     ) {
         PullToRefreshBox(
             isRefreshing = onRefresh != null && isRefreshing,
