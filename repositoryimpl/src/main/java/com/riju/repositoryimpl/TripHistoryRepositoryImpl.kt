@@ -7,6 +7,7 @@ import com.riju.remotedatasourceimpl.UserDataSource
 import com.riju.repository.TripHistoryRepository
 import com.riju.repository.model.TrackingPoint
 import com.riju.repository.model.TripDetails
+import java.time.ZonedDateTime
 import javax.inject.Inject
 
 class TripHistoryRepositoryImpl @Inject constructor(
@@ -20,8 +21,8 @@ class TripHistoryRepositoryImpl @Inject constructor(
                 .map { tripDetails ->
                     TripDetails(
                         tripId = tripDetails.tripId,
-                        startTime = tripDetails.startTime,
-                        endTime = tripDetails.endTime,
+                        startTime = ZonedDateTime.parse(tripDetails.startTime),
+                        endTime = ZonedDateTime.parse(tripDetails.endTime),
                         startLocation = tripDetails.startLocation,
                         endLocation = tripDetails.endLocation,
                     )
@@ -60,8 +61,8 @@ class TripHistoryRepositoryImpl @Inject constructor(
             remoteTrackingDataSource.getTripDetails(currentUser, tripId).let { tripDetails ->
                 TripDetails(
                     tripId = tripId,
-                    startTime = requireNotNull(tripDetails?.startTime),
-                    endTime = tripDetails?.endTime,
+                    startTime = ZonedDateTime.parse(requireNotNull(tripDetails?.startTime)),
+                    endTime = ZonedDateTime.parse(tripDetails?.endTime),
                     startLocation = requireNotNull(tripDetails?.startLocation),
                     endLocation = tripDetails?.endLocation,
                 )

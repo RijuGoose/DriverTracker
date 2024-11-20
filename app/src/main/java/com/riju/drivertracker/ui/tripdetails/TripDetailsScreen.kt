@@ -30,7 +30,7 @@ import com.riju.drivertracker.extensions.toTimeString
 import com.riju.drivertracker.ui.tripdetails.components.TripDetailCard
 import com.riju.drivertracker.ui.uicomponents.DTBottomSheetScaffold
 import com.riju.drivertracker.ui.uicomponents.DTTopAppBar
-import java.time.LocalDateTime
+import java.time.ZonedDateTime
 
 @Suppress("MagicNumber")
 @Composable
@@ -110,8 +110,8 @@ fun TripDetailData(
     avgSpeed: Double,
     maxSpeed: Double,
     distance: Double,
-    startTime: LocalDateTime,
-    endTime: LocalDateTime?,
+    startTime: ZonedDateTime,
+    endTime: ZonedDateTime?,
     startLocation: String?,
     endLocation: String?,
     getStartLocation: (() -> Unit)?,

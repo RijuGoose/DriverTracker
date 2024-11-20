@@ -19,7 +19,8 @@ import com.riju.drivertracker.extensions.toLocalDateString
 import com.riju.drivertracker.extensions.toTimeString
 import com.riju.drivertracker.ui.theme.DriverTrackerTheme
 import com.riju.drivertracker.ui.triphistory.model.TripHistoryItemUIModel
-import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 @Composable
 fun TripHistoryItem(
@@ -71,8 +72,8 @@ fun TripHistoryItemPreview() {
             onTripSelected = {},
             trip = TripHistoryItemUIModel(
                 tripId = "1",
-                startTime = LocalDateTime.of(2021, 9, 2, 12, 0),
-                endTime = LocalDateTime.of(2021, 9, 3, 13, 0),
+                startTime = ZonedDateTime.of(2021, 9, 2, 12, 0, 0, 0, ZoneId.of("UTC")),
+                endTime = ZonedDateTime.of(2021, 9, 3, 13, 0, 0, 0, ZoneId.of("UTC")),
                 startLocation = "Budapest",
                 endLocation = null,
             )

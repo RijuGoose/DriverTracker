@@ -1,11 +1,11 @@
 package com.riju.drivertracker.ui.triphistory.model
 
-import java.time.LocalDateTime
+import java.time.ZonedDateTime
 
 data class TripHistoryItemUIModel(
     val tripId: String,
-    val startTime: LocalDateTime,
-    val endTime: LocalDateTime? = null,
+    val startTime: ZonedDateTime,
+    val endTime: ZonedDateTime? = null,
     val startLocation: String? = null,
     val endLocation: String? = null,
 )

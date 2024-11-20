@@ -13,7 +13,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.time.LocalDateTime
 import javax.inject.Inject
 
 @HiltViewModel
@@ -37,8 +36,8 @@ class TripHistoryViewModel @Inject constructor(
                     tripHistoryRepository.getAllTripHistory(orderBy, _isOrderAscending.value).map {
                         TripHistoryItemUIModel(
                             tripId = it.tripId,
-                            startTime = LocalDateTime.parse(it.startTime),
-                            endTime = it.endTime?.let { endTime -> LocalDateTime.parse(endTime) },
+                            startTime = it.startTime,
+                            endTime = it.endTime,
                             startLocation = it.startLocation,
                             endLocation = it.endLocation
                         )

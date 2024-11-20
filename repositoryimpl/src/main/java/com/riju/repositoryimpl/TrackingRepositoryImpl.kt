@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
-import java.time.LocalDateTime
+import java.time.ZonedDateTime
 import java.util.UUID
 import javax.inject.Inject
 
@@ -32,18 +32,23 @@ class TrackingRepositoryImpl @Inject constructor(
     override fun startTracking() {
         currentTripId.value = UUID.randomUUID().toString()
         currentTripCounter = 0
+
+        initTrip()
+    }
+
+    private fun initTrip() {
         userDataSource.getUser()?.let { currentUser ->
             remoteTrackingDataSource.addTripDetails(
                 user = currentUser,
                 tripId = requireNotNull(currentTripId.value),
                 tripDetails = TripDetailsRequest(
-                    startTime = LocalDateTime.now().toString()
+                    startTime = ZonedDateTime.now().toString()
                 )
             )
         } ?: localTrackingDataSource.addTrip(
             trip = TripEntity(
                 tripId = requireNotNull(currentTripId.value),
-                startTime = LocalDateTime.now().toString()
+                startTime = ZonedDateTime.now()
             )
         )
     }
@@ -105,11 +110,11 @@ class TrackingRepositoryImpl @Inject constructor(
             remoteTrackingDataSource.modifyEndTime(
                 user = currentUser,
                 tripId = requireNotNull(currentTripId.value),
-                endTime = LocalDateTime.now().toString()
+                endTime = ZonedDateTime.now().toString()
             )
         } ?: localTrackingDataSource.modifyEndTime(
             tripId = requireNotNull(currentTripId.value),
-            endTime = LocalDateTime.now().toString()
+            endTime = ZonedDateTime.now().toString()
         )
         currentTripId.value = null
     }

@@ -21,7 +21,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.math.RoundingMode
-import java.time.LocalDateTime
 import javax.inject.Inject
 
 @HiltViewModel
@@ -67,21 +66,23 @@ class TripDetailsViewModel @Inject constructor(
                         boundsBuilder.include(point.first)
                     }
                     _mapBounds.value = boundsBuilder.build()
-                    _screenStatus.value = ScreenStatus.Success(
-                        TripDetailsUiModel(
-                            avgSpeed = tripData.map {
-                                it.speed
-                            }.average()
-                                .toBigDecimal().setScale(2, RoundingMode.HALF_UP)
-                                .toDouble(), // TODO extension erre
-                            maxSpeed = maxSpeed,
-                            distance = 0.0, // TODO how to get it
-                            startTime = LocalDateTime.parse(tripDetails?.startTime),
-                            endTime = tripDetails?.endTime?.let { endTime -> LocalDateTime.parse(endTime) },
-                            startLocation = tripDetails?.startLocation,
-                            endLocation = tripDetails?.endLocation
+                    tripDetails?.let { tripDetails ->
+                        _screenStatus.value = ScreenStatus.Success(
+                            TripDetailsUiModel(
+                                avgSpeed = tripData.map {
+                                    it.speed
+                                }.average()
+                                    .toBigDecimal().setScale(2, RoundingMode.HALF_UP)
+                                    .toDouble(), // TODO extension erre
+                                maxSpeed = maxSpeed,
+                                distance = 0.0, // TODO how to get it
+                                startTime = tripDetails.startTime,
+                                endTime = tripDetails.endTime,
+                                startLocation = tripDetails.startLocation,
+                                endLocation = tripDetails.endLocation
+                            )
                         )
-                    )
+                    }
                 } ?: run {
                     _screenStatus.value = ScreenStatus.ErrorFullScreen(
                         error = context.getString(R.string.trip_details_error_trip_not_found)
