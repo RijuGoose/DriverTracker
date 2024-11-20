@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface TrackingRepository {
     val isTracking: Flow<Boolean>
-    fun startTracking()
+    suspend fun startTracking()
     fun addRoutePoint(trackingPoint: TrackingPoint)
     suspend fun stopTracking()
     fun isTracking(): Boolean

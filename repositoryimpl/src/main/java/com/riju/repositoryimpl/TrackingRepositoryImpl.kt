@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import java.time.Duration
 import java.time.ZonedDateTime
 import java.util.UUID
 import javax.inject.Inject
@@ -29,9 +30,25 @@ class TrackingRepositoryImpl @Inject constructor(
 
     override val isTracking = currentTripId.map { it != null }
 
-    override fun startTracking() {
+    override suspend fun startTracking() {
         currentTripId.value = UUID.randomUUID().toString()
         currentTripCounter = 0
+
+        val lastTrip = localTrackingDataSource.getLastTripDetails()
+
+        lastTrip?.let { trip ->
+            val duration = Duration.between(lastTrip.endTime, ZonedDateTime.now())
+
+            if (duration < Duration.ofMinutes(1)) {
+                val tripPoints = localTrackingDataSource.getTripPoints(trip.tripId)
+                currentTripId.value = trip.tripId
+                tripPoints.lastOrNull()?.let { lastPoint ->
+                    currentTripCounter = lastPoint.pointCount + 1
+                }
+            } else {
+                initTrip()
+            }
+        } ?: initTrip()
 
         initTrip()
     }

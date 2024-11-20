@@ -42,6 +42,9 @@ interface TripDao {
     @Query("SELECT * FROM trips WHERE tripId = :tripId")
     suspend fun getTripDetails(tripId: String): TripEntity?
 
+    @Query("SELECT * FROM trips ORDER BY endTime DESC LIMIT 1")
+    suspend fun getLastTripDetails(): TripEntity?
+
     @Update
     fun updateTrip(trip: TripEntity)
 

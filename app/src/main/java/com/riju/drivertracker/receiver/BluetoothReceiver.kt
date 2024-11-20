@@ -47,7 +47,7 @@ class BluetoothReceiver : BroadcastReceiver() {
                         this.action = LocationService.ACTION_TRIP_START
                         context?.startForegroundService(this)
                     }
-                } // TODO handle short-time disconnects
+                }
             }
 
             BluetoothDevice.ACTION_ACL_DISCONNECTED -> {

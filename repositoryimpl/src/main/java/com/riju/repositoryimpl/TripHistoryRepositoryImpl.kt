@@ -78,6 +78,24 @@ class TripHistoryRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getLastTripDetails(): TripDetails? {
+        return userDataSource.getUser()?.let {
+            // TODO implement
+            null
+        } ?: localTrackingDataSource.getAllTripHistory(
+            orderBy = DatabaseConstants.Field.EndTime.fieldName,
+            isAscending = false
+        ).map { tripEntity ->
+            TripDetails(
+                tripId = tripEntity.tripId,
+                startTime = tripEntity.startTime,
+                endTime = tripEntity.endTime,
+                startLocation = tripEntity.startLocation,
+                endLocation = tripEntity.endLocation,
+            )
+        }.firstOrNull()
+    }
+
     override suspend fun modifyStartLocation(tripId: String, startLocation: String) {
         userDataSource.getUser()?.let { currentUser ->
             remoteTrackingDataSource.modifyStartLocation(currentUser, tripId, startLocation)

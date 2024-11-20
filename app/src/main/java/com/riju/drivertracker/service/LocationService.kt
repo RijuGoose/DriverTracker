@@ -42,14 +42,16 @@ class LocationService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        when (intent?.action) {
-            ACTION_TRIP_START -> start()
-            ACTION_TRIP_STOP -> stop()
+        serviceScope.launch {
+            when (intent?.action) {
+                ACTION_TRIP_START -> start()
+                ACTION_TRIP_STOP -> stop()
+            }
         }
         return super.onStartCommand(intent, flags, startId)
     }
 
-    private fun start() {
+    private suspend fun start() {
         val notification = NotificationCompat.Builder(this, "location")
             .setContentTitle("Tracking")
             .setContentText("Driver is on the way")
@@ -87,12 +89,10 @@ class LocationService : Service() {
         startForeground(1, notification.build(), FOREGROUND_SERVICE_TYPE_LOCATION)
     }
 
-    private fun stop() {
-        serviceScope.launch {
-            trackingRepository.stopTracking()
-            stopForeground(STOP_FOREGROUND_REMOVE)
-            stopSelf()
-        }
+    private suspend fun stop() {
+        trackingRepository.stopTracking()
+        stopForeground(STOP_FOREGROUND_REMOVE)
+        stopSelf()
     }
 
     override fun onDestroy() {
