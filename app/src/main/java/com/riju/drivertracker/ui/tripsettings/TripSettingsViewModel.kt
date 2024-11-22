@@ -7,17 +7,16 @@ import com.riju.drivertracker.ui.ScreenStatus
 import com.riju.repository.BluetoothRepository
 import com.riju.repository.SettingsRepository
 import com.riju.repository.model.BTDevice
-import com.riju.repository.model.Settings
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @SuppressLint("MissingPermission")
+@Suppress("TooManyFunctions")
 @HiltViewModel
 class TripSettingsViewModel @Inject constructor(
     private val settingsRepository: SettingsRepository,
@@ -28,40 +27,44 @@ class TripSettingsViewModel @Inject constructor(
     private val _backgroundLocationPermissionDialog = MutableStateFlow(false)
     val backgroundLocationPermissionDialog = _backgroundLocationPermissionDialog.asStateFlow()
 
-    val settings =
-        settingsRepository.settings.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = Settings( // TODO temporary solution (should be removed later)
-                automaticTrip = false,
-                calendarEvent = false,
-                btDeviceName = "",
-                btDeviceMacAddress = ""
-            )
-        )
+    val tripSecondsConditionValid: () -> Boolean = {
+        !_settingsUiModel.value.shouldMergeTrips ||
+            _settingsUiModel.value.mergeTripSeconds in 1..300
+    }
 
     var btBondedDevices: List<BTDevice> = emptyList()
         private set
 
-    private val _btDeviceName = MutableStateFlow("")
-    val btDeviceName = _btDeviceName.asStateFlow()
+    private val _settingsUiModel = MutableStateFlow(SettingsUiModel())
+    val settingsUiModel = _settingsUiModel.asStateFlow()
 
     fun setAutomaticTrip(value: Boolean) {
-        viewModelScope.launch {
-            settingsRepository.setAutomaticTrip(value)
+        _settingsUiModel.update {
+            it.copy(automaticTrip = value)
         }
     }
 
     fun setTripCalendarEvent(value: Boolean) {
-        viewModelScope.launch {
-            settingsRepository.setTripCalendarEvent(value)
+        _settingsUiModel.update {
+            it.copy(calendarEvent = value)
+        }
+    }
+
+    fun setShouldMergeTrips(value: Boolean) {
+        _settingsUiModel.update {
+            it.copy(shouldMergeTrips = value)
         }
     }
 
     fun setBluetoothDeviceName(value: String) {
-        _btDeviceName.value = value
-        viewModelScope.launch {
-            settingsRepository.setBluetoothDeviceName(value)
+        _settingsUiModel.update {
+            it.copy(btDeviceName = value)
+        }
+    }
+
+    fun setMergeTripSeconds(value: String) {
+        _settingsUiModel.update {
+            it.copy(mergeTripSeconds = value.toIntOrNull())
         }
     }
 
@@ -85,9 +88,50 @@ class TripSettingsViewModel @Inject constructor(
         _bluetoothPermissionDialog.value = false
     }
 
+    fun saveChanges() {
+        viewModelScope.launch {
+            try {
+                if (isFormValid()) {
+                    val settings = with(_settingsUiModel.value) {
+                        val currentSettings = settingsRepository.settings.first()
+
+                        currentSettings.copy(
+                            automaticTrip = automaticTrip,
+                            btDeviceName = btDeviceName,
+                            calendarEvent = calendarEvent,
+                            shouldMergeTrips = shouldMergeTrips,
+                            mergeTripSeconds = if (shouldMergeTrips) {
+                                requireNotNull(mergeTripSeconds)
+                            } else {
+                                currentSettings.mergeTripSeconds
+                            }
+                        )
+                    }
+                    settingsRepository.updateSettings(settings)
+                    showSnackBar("Settings saved")
+                } else {
+                    showSnackBar("Something went wrong")
+                }
+            } catch (ex: Exception) {
+                showSnackBar("Error while saving settings")
+            }
+        }
+    }
+
+    private fun isFormValid(): Boolean {
+        return tripSecondsConditionValid()
+    }
+
     init {
         viewModelScope.launch {
-            _btDeviceName.value = settingsRepository.settings.first().btDeviceName
+            val settings = settingsRepository.settings.first()
+            _settingsUiModel.value = SettingsUiModel(
+                automaticTrip = settings.automaticTrip,
+                btDeviceName = settings.btDeviceName,
+                calendarEvent = settings.calendarEvent,
+                shouldMergeTrips = settings.shouldMergeTrips,
+                mergeTripSeconds = settings.mergeTripSeconds
+            )
             _screenStatus.value = ScreenStatus.Success(Unit)
         }
     }

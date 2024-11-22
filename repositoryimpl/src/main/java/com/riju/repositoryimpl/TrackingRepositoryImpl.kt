@@ -7,12 +7,14 @@ import com.riju.remotedatasourceimpl.RemoteTrackingDataSource
 import com.riju.remotedatasourceimpl.UserDataSource
 import com.riju.remotedatasourceimpl.model.routepoint.RoutePointRequest
 import com.riju.remotedatasourceimpl.model.tripdetails.TripDetailsRequest
+import com.riju.repository.SettingsRepository
 import com.riju.repository.TrackingRepository
 import com.riju.repository.model.TrackingPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import java.time.Duration
@@ -24,6 +26,7 @@ class TrackingRepositoryImpl @Inject constructor(
     private val remoteTrackingDataSource: RemoteTrackingDataSource,
     private val localTrackingDataSource: LocalTrackingDataSource,
     private val userDataSource: UserDataSource,
+    private val settingsRepository: SettingsRepository
 ) : TrackingRepository {
     private val currentTripId: MutableStateFlow<String?> = MutableStateFlow(null)
     private var currentTripCounter: Int = 0
@@ -35,22 +38,29 @@ class TrackingRepositoryImpl @Inject constructor(
         currentTripCounter = 0
 
         val lastTrip = localTrackingDataSource.getLastTripDetails()
+        val shouldMergeTrips = settingsRepository.settings.first().shouldMergeTrips
 
+        if (shouldMergeTrips) {
+            resumeOrInitTrip(lastTrip)
+        } else {
+            initTrip()
+        }
+    }
+
+    private suspend fun resumeOrInitTrip(lastTrip: TripEntity?) {
         lastTrip?.let { trip ->
-            val duration = Duration.between(lastTrip.endTime, ZonedDateTime.now())
+            val duration = Duration.between(trip.endTime, ZonedDateTime.now())
+            val tripMergeDuration = settingsRepository.settings.first().mergeTripSeconds.toLong()
 
-            if (duration < Duration.ofMinutes(1)) {
-                val tripPoints = localTrackingDataSource.getTripPoints(trip.tripId)
-                currentTripId.value = trip.tripId
-                tripPoints.lastOrNull()?.let { lastPoint ->
+            if (duration < Duration.ofSeconds(tripMergeDuration)) {
+                localTrackingDataSource.getTripPoints(trip.tripId).lastOrNull()?.let { lastPoint ->
+                    currentTripId.value = trip.tripId
                     currentTripCounter = lastPoint.pointCount + 1
                 }
             } else {
                 initTrip()
             }
         } ?: initTrip()
-
-        initTrip()
     }
 
     private fun initTrip() {

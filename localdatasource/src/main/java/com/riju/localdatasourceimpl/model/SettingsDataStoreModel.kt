@@ -6,6 +6,8 @@ import kotlinx.serialization.Serializable
 data class SettingsDataStoreModel(
     val automaticTrip: Boolean = false,
     val calendarEvent: Boolean = false,
+    val shouldMergeTrips: Boolean = false,
     val btDeviceName: String = "",
-    val btDeviceMacAddress: String = ""
+    val btDeviceMacAddress: String = "",
+    val mergeTripSeconds: Int = 60
 )

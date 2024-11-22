@@ -10,7 +10,8 @@ data class DTTopAppBar(
 )
 
 data class DTTopBarActionButton(
-    val icon: ActionIcon,
+    val icon: ActionIcon? = null,
+    val text: String? = null,
     val onClick: () -> Unit,
     val contentDescription: String
 ) {

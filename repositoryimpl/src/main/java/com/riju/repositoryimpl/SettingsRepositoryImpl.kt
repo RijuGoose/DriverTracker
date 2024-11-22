@@ -3,6 +3,8 @@ package com.riju.repositoryimpl
 import com.riju.localdatasourceimpl.SettingsDataSource
 import com.riju.repository.SettingsRepository
 import com.riju.repository.model.Settings
+import com.riju.repositoryimpl.mapper.toSettings
+import com.riju.repositoryimpl.mapper.toSettingsDataStoreModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -12,13 +14,22 @@ class SettingsRepositoryImpl @Inject constructor(
 ) : SettingsRepository {
     override val settings: Flow<Settings>
         get() = settingsDataSource.settings.map {
-            Settings(
-                automaticTrip = it.automaticTrip,
-                calendarEvent = it.calendarEvent,
-                btDeviceName = it.btDeviceName,
-                btDeviceMacAddress = it.btDeviceMacAddress
-            )
+            it.toSettings()
         }
+
+    override suspend fun setShouldMergeTrips(value: Boolean) {
+        settingsDataSource.updateSettings { it.copy(shouldMergeTrips = value) }
+    }
+
+    override suspend fun setMergeTripSeconds(value: Int) {
+        settingsDataSource.updateSettings { it.copy(mergeTripSeconds = value) }
+    }
+
+    override suspend fun updateSettings(settings: Settings) {
+        settingsDataSource.updateSettings {
+            settings.toSettingsDataStoreModel()
+        }
+    }
 
     override suspend fun setAutomaticTrip(value: Boolean) {
         settingsDataSource.updateSettings { it.copy(automaticTrip = value) }

@@ -4,19 +4,13 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.contentColorFor
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.rememberBottomSheetScaffoldState
@@ -148,29 +142,7 @@ private fun <T : Any> DTBottomSheetScaffoldTopAppBar(
         isRefreshing = isRefreshing,
         topBar = {
             if (topBar != null) {
-                TopAppBar(
-                    title = {
-                        Text(topBar.title)
-                    },
-                    navigationIcon = {
-                        if (topBar.onBackButtonClicked != null) {
-                            IconButton(onClick = topBar.onBackButtonClicked::invoke) {
-                                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                            }
-                        }
-                    },
-                    actions = {
-                        topBar.actionButtons?.forEach { actionButton ->
-                            IconButton(onClick = actionButton.onClick::invoke) {
-                                Icon(
-                                    imageVector = actionButton.icon.icon,
-                                    modifier = actionButton.icon.modifier,
-                                    contentDescription = actionButton.contentDescription
-                                )
-                            }
-                        }
-                    }
-                )
+                DTTopBar(topBar)
             }
         },
         snackbarHost = snackbarHost,
