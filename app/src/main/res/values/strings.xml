@@ -47,7 +47,7 @@
     <string name="trip_settings_bg_location_permission">Background location</string>
     <string name="trip_settings_bt_permission">Bluetooth</string>
     <string name="trip_settings_automatic_trip_switch">Automatic trip</string>
-    <string name="trip_settings_automatic_trip_description">Start a trip when the phone is connected to a bluetooth device</string>
+    <string name="trip_settings_automatic_trip_description">Start a trip when the phone is connected to a bluetooth device. Enter the name or select it by clicking the icon.</string>
     <string name="trip_settings_automatic_trip_bt_device_name_label">Bluetooth device name</string>
     <string name="trip_settings_merge_trips_switch">Merge trips</string>
     <string name="trip_settings_merge_trip_description">If the time elapsed between the end of the previous trip and the currently initiated trip is less than the specified duration, the previous trip continues.</string>

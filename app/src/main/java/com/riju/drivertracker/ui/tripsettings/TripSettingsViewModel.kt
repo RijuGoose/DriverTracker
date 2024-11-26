@@ -7,6 +7,7 @@ import com.riju.drivertracker.ui.ScreenStatus
 import com.riju.repository.BluetoothRepository
 import com.riju.repository.SettingsRepository
 import com.riju.repository.model.BTDevice
+import com.riju.repository.model.UserPermissionState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -27,13 +28,18 @@ class TripSettingsViewModel @Inject constructor(
     private val _backgroundLocationPermissionDialog = MutableStateFlow(false)
     val backgroundLocationPermissionDialog = _backgroundLocationPermissionDialog.asStateFlow()
 
+    private val _pairedDevicesSheet = MutableStateFlow(false)
+    val pairedDevicesSheet = _pairedDevicesSheet.asStateFlow()
+
     val tripSecondsConditionValid: () -> Boolean = {
         !_settingsUiModel.value.shouldMergeTrips ||
             _settingsUiModel.value.mergeTripSeconds in 1..300
     }
 
-    var btBondedDevices: List<BTDevice> = emptyList()
-        private set
+    private val _btPairedDevices: MutableStateFlow<UserPermissionState<List<BTDevice>>> = MutableStateFlow(
+        UserPermissionState.Denied
+    )
+    val btPairedDevices = _btPairedDevices.asStateFlow()
 
     private val _settingsUiModel = MutableStateFlow(SettingsUiModel())
     val settingsUiModel = _settingsUiModel.asStateFlow()
@@ -41,12 +47,6 @@ class TripSettingsViewModel @Inject constructor(
     fun setAutomaticTrip(value: Boolean) {
         _settingsUiModel.update {
             it.copy(automaticTrip = value)
-        }
-    }
-
-    fun setTripCalendarEvent(value: Boolean) {
-        _settingsUiModel.update {
-            it.copy(calendarEvent = value)
         }
     }
 
@@ -68,24 +68,16 @@ class TripSettingsViewModel @Inject constructor(
         }
     }
 
-    fun getBondedBTDevices() {
-        btBondedDevices = bluetoothRepository.getBondedDevices()
+    fun getPairedBTDevices() {
+        _btPairedDevices.value = bluetoothRepository.getPairedDevices()
     }
 
-    fun showBackgroundLocationPermissionDialog() {
-        _backgroundLocationPermissionDialog.value = true
+    fun toggleBackgroundLocationPermissionDialog(show: Boolean) {
+        _backgroundLocationPermissionDialog.value = show
     }
 
-    fun hideBackgroundLocationPermissionDialog() {
-        _backgroundLocationPermissionDialog.value = false
-    }
-
-    fun showBluetoothPermissionDialog() {
-        _bluetoothPermissionDialog.value = true
-    }
-
-    fun hideBluetoothPermissionDialog() {
-        _bluetoothPermissionDialog.value = false
+    fun toggleBluetoothPermissionDialog(show: Boolean) {
+        _bluetoothPermissionDialog.value = show
     }
 
     fun saveChanges() {
@@ -98,7 +90,6 @@ class TripSettingsViewModel @Inject constructor(
                         currentSettings.copy(
                             automaticTrip = automaticTrip,
                             btDeviceName = btDeviceName,
-                            calendarEvent = calendarEvent,
                             shouldMergeTrips = shouldMergeTrips,
                             mergeTripSeconds = if (shouldMergeTrips) {
                                 requireNotNull(mergeTripSeconds)
@@ -122,13 +113,16 @@ class TripSettingsViewModel @Inject constructor(
         return tripSecondsConditionValid()
     }
 
+    fun toggleBluetoothDeviceSheet(show: Boolean) {
+        _pairedDevicesSheet.value = show
+    }
+
     init {
         viewModelScope.launch {
             val settings = settingsRepository.settings.first()
             _settingsUiModel.value = SettingsUiModel(
                 automaticTrip = settings.automaticTrip,
                 btDeviceName = settings.btDeviceName,
-                calendarEvent = settings.calendarEvent,
                 shouldMergeTrips = settings.shouldMergeTrips,
                 mergeTripSeconds = settings.mergeTripSeconds
             )

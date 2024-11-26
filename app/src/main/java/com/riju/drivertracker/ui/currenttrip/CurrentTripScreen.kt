@@ -152,15 +152,14 @@ fun CurrentTripScreen(
             }
         }
 
-        if (locationPermissionDialog) {
-            PermissionAlertDialog(
-                permissionName = "Location",
-                onConfirmButton = {
-                    context.openSettings()
-                    viewModel.hideLocationPermissionDialog()
-                },
-                onDismissDialog = viewModel::hideLocationPermissionDialog
-            )
-        }
+        PermissionAlertDialog(
+            showDialog = locationPermissionDialog,
+            permissionName = "Location",
+            onConfirmButton = {
+                context.openSettings()
+                viewModel.hideLocationPermissionDialog()
+            },
+            onDismissDialog = viewModel::hideLocationPermissionDialog
+        )
     }
 }

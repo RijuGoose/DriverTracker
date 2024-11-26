@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
@@ -26,7 +27,9 @@ fun ExpandableSwitch(
     isChecked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     onTextFieldChange: (String) -> Unit,
-    textFieldCondition: Boolean,
+    textFieldCondition: Boolean? = null,
+    textFieldTrailingIcon: (@Composable () -> Unit)? = null,
+    onTrailingIconClick: (() -> Unit)? = null
 ) {
     OutlinedCard {
         SwitchCard(
@@ -53,10 +56,17 @@ fun ExpandableSwitch(
                 DTOutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
                     value = textFieldValue ?: "",
-                    isError = !textFieldCondition,
+                    isError = textFieldCondition == false,
                     onValueChange = onTextFieldChange,
                     supportingText = supportingText,
-                    label = textFieldLabel
+                    label = textFieldLabel,
+                    trailingIcon = {
+                        onTrailingIconClick?.let {
+                            IconButton(onClick = onTrailingIconClick) {
+                                textFieldTrailingIcon?.invoke()
+                            }
+                        }
+                    }
                 )
             }
         }

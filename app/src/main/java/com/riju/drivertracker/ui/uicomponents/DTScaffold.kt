@@ -33,7 +33,7 @@ import kotlinx.coroutines.launch
 fun <T : Any> DTScaffold(
     viewModel: BaseViewModel<T>,
     modifier: Modifier = Modifier,
-    onRefresh: () -> Unit = {},
+    onRefresh: (() -> Unit)? = null,
     horizontalPadding: Dp = 8.dp,
     topBar: DTTopAppBar? = null,
     floatingActionButton: @Composable () -> Unit = {},
@@ -73,7 +73,7 @@ private fun <T : Any> DTScaffoldSnackBarHost(
     errorState: SharedFlow<String>,
     showLoadingDialog: Boolean = false,
     snackBarState: SharedFlow<String>,
-    onRefresh: () -> Unit = {},
+    onRefresh: (() -> Unit)? = null,
     isRefreshing: Boolean = false,
     horizontalPadding: Dp = 8.dp,
     topBar: DTTopAppBar? = null,
