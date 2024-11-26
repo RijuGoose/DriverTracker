@@ -5,7 +5,7 @@ import com.riju.localdatasourceimpl.LocalTrackingDataSource
 import com.riju.repository.TripHistoryRepository
 import com.riju.repository.model.TrackingPoint
 import com.riju.repository.model.TripDetails
-import java.time.ZonedDateTime
+import com.riju.repositoryimpl.extensions.distanceBetweenInMeters
 import javax.inject.Inject
 
 class TripHistoryRepositoryImpl @Inject constructor(
@@ -62,17 +62,9 @@ class TripHistoryRepositoryImpl @Inject constructor(
 
     @Suppress("MagicNumber")
     override suspend fun getDistanceTravelled(tripId: String): Double {
-        return localTrackingDataSource.getTripPoints(tripId).zipWithNext { point1, point2 ->
-            Location("point1").apply {
-                latitude = point1.latitude
-                longitude = point1.longitude
-            }.distanceTo(
-                Location("point2").apply {
-                    latitude = point2.latitude
-                    longitude = point2.longitude
-                }
-            )
-        }.sum().toDouble() / 1000
+        return getTripHistoryRouteById(tripId).zipWithNext { point1, point2 ->
+            point1.distanceBetweenInMeters(point2)
+        }.sum() / 1000
     }
 
     override suspend fun modifyStartLocation(tripId: String, startLocation: String) {

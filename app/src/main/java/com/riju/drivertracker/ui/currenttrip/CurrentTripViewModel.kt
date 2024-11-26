@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -50,7 +51,13 @@ class CurrentTripViewModel @Inject constructor(
     private val _locationPermissionDialog = MutableStateFlow(false)
     val locationPermissionDialog = _locationPermissionDialog.asStateFlow()
 
+    private val _currentLocation = MutableStateFlow<LatLng?>(null)
+    val currentLocation = _currentLocation.asStateFlow()
+
     init {
+        viewModelScope.launch {
+            getCurrentLocation()
+        }
         val action = savedStateHandle.toRoute<Screen.CurrentTrip>().action
         when (action) {
             CurrentTripAction.Start -> {
@@ -95,8 +102,8 @@ class CurrentTripViewModel @Inject constructor(
         hideLoadingDialog()
     }
 
-    suspend fun getCurrentLocation(): LatLng? {
-        return when (val locationPermissionState = locationRepository.getCurrentLocation()) {
+    private suspend fun getCurrentLocation() {
+        _currentLocation.value = when (val locationPermissionState = locationRepository.getCurrentLocation()) {
             is UserPermissionState.Granted -> {
                 LatLng(locationPermissionState.value.latitude, locationPermissionState.value.longitude)
             }
