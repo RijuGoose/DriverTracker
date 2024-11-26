@@ -35,10 +35,6 @@ class SettingsRepositoryImpl @Inject constructor(
         settingsDataSource.updateSettings { it.copy(automaticTrip = value) }
     }
 
-    override suspend fun setTripCalendarEvent(value: Boolean) {
-        settingsDataSource.updateSettings { it.copy(calendarEvent = value) }
-    }
-
     override suspend fun setBluetoothDeviceName(value: String) {
         settingsDataSource.updateSettings { it.copy(btDeviceName = value) }
     }
