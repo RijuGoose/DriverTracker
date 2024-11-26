@@ -1,5 +1,6 @@
 package com.riju.drivertracker.ui.uicomponents
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -190,17 +191,26 @@ fun <T : Any> DTScaffoldPullToRefresh(
         contentColor = contentColor,
         contentWindowInsets = contentWindowInsets
     ) {
-        PullToRefreshBox(
-            isRefreshing = onRefresh != null && isRefreshing,
-            onRefresh = {
-                onRefresh?.invoke()
-            },
-            modifier = Modifier
-                .padding(horizontal = horizontalPadding)
-                .padding(top = it.calculateTopPadding())
-                .fillMaxSize()
-        ) {
-            DTScaffoldContent(screenStatus, content, showLoadingDialog)
+        if (onRefresh != null) {
+            PullToRefreshBox(
+                isRefreshing = isRefreshing,
+                onRefresh = onRefresh,
+                modifier = Modifier
+                    .padding(horizontal = horizontalPadding)
+                    .padding(top = it.calculateTopPadding())
+                    .fillMaxSize()
+            ) {
+                DTScaffoldContent(screenStatus, content, showLoadingDialog)
+            }
+        } else {
+            Box(
+                modifier = Modifier
+                    .padding(horizontal = horizontalPadding)
+                    .padding(top = it.calculateTopPadding())
+                    .fillMaxSize()
+            ) {
+                DTScaffoldContent(screenStatus, content, showLoadingDialog)
+            }
         }
     }
 }
