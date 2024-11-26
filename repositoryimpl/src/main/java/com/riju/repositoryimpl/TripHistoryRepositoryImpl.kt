@@ -1,5 +1,6 @@
 package com.riju.repositoryimpl
 
+import android.location.Location
 import com.riju.domain.model.common.DatabaseConstants
 import com.riju.localdatasourceimpl.LocalTrackingDataSource
 import com.riju.remotedatasourceimpl.RemoteTrackingDataSource
@@ -94,6 +95,21 @@ class TripHistoryRepositoryImpl @Inject constructor(
                 endLocation = tripEntity.endLocation,
             )
         }.firstOrNull()
+    }
+
+    @Suppress("MagicNumber")
+    override suspend fun getDistanceTravelled(tripId: String): Double {
+        return localTrackingDataSource.getTripPoints(tripId).zipWithNext { point1, point2 ->
+            Location("point1").apply {
+                latitude = point1.latitude
+                longitude = point1.longitude
+            }.distanceTo(
+                Location("point2").apply {
+                    latitude = point2.latitude
+                    longitude = point2.longitude
+                }
+            )
+        }.sum().toDouble() / 1000
     }
 
     override suspend fun modifyStartLocation(tripId: String, startLocation: String) {

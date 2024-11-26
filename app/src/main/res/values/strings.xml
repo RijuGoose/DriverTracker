@@ -36,6 +36,7 @@
     <string name="trip_details_end_location">End location</string>
     <string name="trip_details_top_bar_title">Trip details</string>
     <string name="trip_details_error_trip_not_found">Trip not found</string>
+    <string name="trip_details_distance_in_km">%1$s km</string>
 
     <string name="current_trip_button_start">Start</string>
     <string name="current_trip_button_stop">Stop</string>

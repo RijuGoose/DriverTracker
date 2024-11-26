@@ -10,6 +10,7 @@ import androidx.navigation.toRoute
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.riju.drivertracker.R
+import com.riju.drivertracker.extensions.roundToDecimalPlaces
 import com.riju.drivertracker.ui.BaseViewModel
 import com.riju.drivertracker.ui.ScreenStatus
 import com.riju.drivertracker.ui.navigation.Screen
@@ -20,7 +21,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.math.RoundingMode
 import javax.inject.Inject
 
 @HiltViewModel
@@ -34,13 +34,7 @@ class TripDetailsViewModel @Inject constructor(
     private val _tripPoints = MutableStateFlow<List<Pair<LatLng, Color>>>(emptyList())
     var tripPoints = _tripPoints.asStateFlow()
 
-    private val _mapBounds =
-        MutableStateFlow(
-            LatLngBounds(
-                LatLng(47.473889, 19.040833),
-                LatLng(47.508611, 19.081944)
-            ) // Budapest city centre
-        )
+    private val _mapBounds = MutableStateFlow<LatLngBounds?>(null)
     val mapBounds = _mapBounds.asStateFlow()
 
     init {
@@ -53,6 +47,7 @@ class TripDetailsViewModel @Inject constructor(
             try {
                 val tripDetails = tripHistoryRepository.getTripDetails(tripId)
                 val tripRoute = tripHistoryRepository.getTripHistoryRouteById(tripId)
+                val tripDistance = tripHistoryRepository.getDistanceTravelled(tripId)
                 tripRoute?.let { tripData ->
                     val maxSpeed = tripData.maxOf { it.speed }
                     _tripPoints.value = tripData.map { tripPoint ->
@@ -71,11 +66,9 @@ class TripDetailsViewModel @Inject constructor(
                             TripDetailsUiModel(
                                 avgSpeed = tripData.map {
                                     it.speed
-                                }.average()
-                                    .toBigDecimal().setScale(2, RoundingMode.HALF_UP)
-                                    .toDouble(), // TODO extension erre
+                                }.average().roundToDecimalPlaces(2),
                                 maxSpeed = maxSpeed,
-                                distance = 0.0, // TODO how to get it
+                                distance = tripDistance.roundToDecimalPlaces(2),
                                 startTime = tripDetails.startTime,
                                 endTime = tripDetails.endTime,
                                 startLocation = tripDetails.startLocation,
@@ -99,9 +92,8 @@ class TripDetailsViewModel @Inject constructor(
         const val CAMERA_PADDING = 100
     }
 
-    // TODO refact these two functions
     @Suppress("MagicNumber")
-    fun getColorForSpeed(speed: Double, minSpeed: Double = 0.0, maxSpeed: Double = 200.0): Color {
+    private fun getColorForSpeed(speed: Double, minSpeed: Double = 0.0, maxSpeed: Double = 200.0): Color {
         val clampedSpeed = speed.coerceIn(minSpeed, maxSpeed)
         val ratio = (clampedSpeed - minSpeed) / (maxSpeed - minSpeed)
 
@@ -122,26 +114,20 @@ class TripDetailsViewModel @Inject constructor(
         val green = Color.Green
         val red = Color.Red
 
-        // Calculate the ratio based on the color input
         val ratio = when {
             color == green -> 0.0
             color == yellow -> 0.5
             color == red -> 1.0
 
-            // If color is between green and yellow
             color.luminance() < yellow.luminance() -> {
-                // Linearly interpolate ratio between green (0.0) and yellow (0.5)
                 color.luminance() / yellow.luminance() * 0.5
             }
 
-            // If color is between yellow and red
             else -> {
-                // Linearly interpolate ratio between yellow (0.5) and red (1.0)
                 0.5 + (color.luminance() - yellow.luminance()) / (red.luminance() - yellow.luminance()) * 0.5
             }
         }
 
-        // Calculate the speed from the ratio
         return minSpeed + (ratio * (maxSpeed - minSpeed))
     }
 

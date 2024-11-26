@@ -7,6 +7,7 @@ import android.location.Address
 import android.location.Geocoder
 import android.location.Location
 import android.location.LocationManager
+import android.os.Build
 import android.os.Looper
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -124,16 +125,21 @@ class LocationRepositoryImpl @Inject constructor(
     override suspend fun getLocationAddress(lat: Double, lon: Double): Address? {
         return if (Geocoder.isPresent()) {
             suspendCoroutine { continuation ->
-                geocoder.getFromLocation(
-                    lat,
-                    lon,
-                    1
-                ) { addresses ->
-                    if (addresses.isNotEmpty()) {
-                        continuation.resume(addresses[0])
-                    } else {
-                        continuation.resume(null)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    geocoder.getFromLocation(
+                        lat,
+                        lon,
+                        1
+                    ) { addresses ->
+                        continuation.resume(addresses.firstOrNull())
                     }
+                } else {
+                    val addresses = geocoder.getFromLocation(
+                        lat,
+                        lon,
+                        1
+                    )
+                    continuation.resume(addresses?.firstOrNull())
                 }
             }
         } else {

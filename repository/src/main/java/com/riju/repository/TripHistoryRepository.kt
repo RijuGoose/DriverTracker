@@ -9,6 +9,7 @@ interface TripHistoryRepository {
     suspend fun getTripHistoryRouteById(tripId: String): List<TrackingPoint>?
     suspend fun getTripDetails(tripId: String): TripDetails?
     suspend fun getLastTripDetails(): TripDetails?
+    suspend fun getDistanceTravelled(tripId: String): Double
     suspend fun modifyStartLocation(tripId: String, startLocation: String)
     suspend fun modifyEndLocation(tripId: String, endLocation: String)
 }
