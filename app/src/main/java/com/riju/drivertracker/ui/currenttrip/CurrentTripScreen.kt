@@ -2,20 +2,24 @@ package com.riju.drivertracker.ui.currenttrip
 
 import android.Manifest
 import android.os.Build
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -42,7 +46,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun CurrentTripScreen(
-    viewModel: CurrentTripViewModel
+    viewModel: CurrentTripViewModel,
 ) {
     val currentTripRoute by viewModel.currentTripRoute.collectAsStateWithLifecycle()
     val isTracking by viewModel.isTracking.collectAsStateWithLifecycle()
@@ -125,62 +129,68 @@ private fun CurrentTripScreenBody(
     isLocationPermissionsGranted: Boolean,
     currentTripRoute: List<LatLng>,
     cameraPositionState: CameraPositionState,
-    currentLocation: LatLng?
+    currentLocation: LatLng?,
 ) {
     val coroutineScope = rememberCoroutineScope()
     Column(modifier = Modifier.fillMaxSize()) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Button(
-                modifier = Modifier.weight(1f),
-                onClick = onStartClick,
-                enabled = !isTripRunning,
-                colors = ButtonDefaults.buttonColors().copy(
-                    containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onTertiaryContainer
-                )
-            ) {
-                Text(text = stringResource(R.string.current_trip_button_start))
-            }
-            Button(
-                modifier = Modifier.weight(1f),
-                onClick = onStopClick,
-                enabled = isLocationPermissionsGranted && isTripRunning,
-                colors = ButtonDefaults.buttonColors().copy(
-                    containerColor = MaterialTheme.colorScheme.error,
-                    contentColor = MaterialTheme.colorScheme.onError
-                )
-            ) {
-                Text(text = stringResource(R.string.current_trip_button_stop))
-            }
-        }
         if (isLocationPermissionsGranted) {
-            GoogleMap(
-                cameraPositionState = cameraPositionState,
-                properties = MapProperties(isMyLocationEnabled = true),
-                onMapLoaded = {
-                    coroutineScope.launch {
-                        currentLocation?.let {
-                            cameraPositionState.animate(
-                                update = CameraUpdateFactory.newLatLngZoom(it, CurrentTripViewModel.ZOOM_LEVEL)
-                            )
+            Box {
+                GoogleMap(
+                    cameraPositionState = cameraPositionState,
+                    properties = MapProperties(isMyLocationEnabled = true),
+                    onMapLoaded = {
+                        coroutineScope.launch {
+                            currentLocation?.let {
+                                cameraPositionState.animate(
+                                    update = CameraUpdateFactory.newLatLngZoom(it, CurrentTripViewModel.ZOOM_LEVEL)
+                                )
+                            }
                         }
-                    }
-                },
-                uiSettings = MapUiSettings(
-                    tiltGesturesEnabled = false,
-                )
-            ) {
-                if (currentTripRoute.isNotEmpty()) {
-                    Polyline(
-                        points = currentTripRoute,
-                        clickable = true,
-                        color = MaterialTheme.colorScheme.primary
+                    },
+                    uiSettings = MapUiSettings(
+                        tiltGesturesEnabled = false,
                     )
+                ) {
+                    if (currentTripRoute.isNotEmpty()) {
+                        Polyline(
+                            points = currentTripRoute,
+                            clickable = true,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+                if (isTripRunning) {
+                    Button(
+                        modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 12.dp).size(100.dp),
+                        onClick = onStopClick,
+                        shape = CircleShape,
+                        colors = ButtonDefaults.buttonColors().copy(
+                            containerColor = MaterialTheme.colorScheme.error,
+                            contentColor = MaterialTheme.colorScheme.onError
+                        )
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Stop,
+                            modifier = Modifier.fillMaxSize(),
+                            contentDescription = stringResource(R.string.current_trip_button_stop)
+                        )
+                    }
+                } else {
+                    Button(
+                        modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 12.dp).size(100.dp),
+                        onClick = onStartClick,
+                        shape = CircleShape,
+                        colors = ButtonDefaults.buttonColors().copy(
+                            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onTertiaryContainer
+                        )
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.PlayArrow,
+                            modifier = Modifier.fillMaxSize(),
+                            contentDescription = stringResource(R.string.current_trip_button_start)
+                        )
+                    }
                 }
             }
         }
