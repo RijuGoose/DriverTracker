@@ -56,7 +56,7 @@ class LocationRepositoryImpl @Inject constructor(
                 close()
             }
 
-            val request = LocationRequest.Builder(interval).build()
+            val request = LocationRequest.Builder(interval).setPriority(Priority.PRIORITY_HIGH_ACCURACY).build()
 
             val locationCallback = object : LocationCallback() {
                 override fun onLocationResult(result: LocationResult) {
