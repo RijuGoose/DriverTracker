@@ -1,6 +1,7 @@
 package com.riju.repositoryimpl.di
 
 import com.riju.repository.BluetoothRepository
+import com.riju.repository.DebugLogRepository
 import com.riju.repository.LocationRepository
 import com.riju.repository.PermissionRepository
 import com.riju.repository.SettingsRepository
@@ -8,6 +9,7 @@ import com.riju.repository.TrackingRepository
 import com.riju.repository.TripHistoryRepository
 import com.riju.repository.UserRepository
 import com.riju.repositoryimpl.BluetoothRepositoryImpl
+import com.riju.repositoryimpl.DebugLogRepositoryImpl
 import com.riju.repositoryimpl.LocationRepositoryImpl
 import com.riju.repositoryimpl.PermissionRepositoryImpl
 import com.riju.repositoryimpl.SettingsRepositoryImpl
@@ -46,4 +48,8 @@ abstract class RepositoryDependencies {
 
     @Binds
     abstract fun provideUserRepositoryImpl(impl: UserRepositoryImpl): UserRepository
+
+    @Singleton
+    @Binds
+    abstract fun provideDebugLogRepositoryImpl(impl: DebugLogRepositoryImpl): DebugLogRepository
 }

@@ -7,6 +7,8 @@ import androidx.datastore.core.DataStoreFactory
 import androidx.datastore.dataStoreFile
 import androidx.room.Room
 import com.riju.localdatasourceimpl.AppDatabase
+import com.riju.localdatasourceimpl.LocalDebugLogDataSource
+import com.riju.localdatasourceimpl.LocalDebugLogDataSourceImpl
 import com.riju.localdatasourceimpl.LocalTrackingDataSource
 import com.riju.localdatasourceimpl.LocalTrackingDataSourceImpl
 import com.riju.localdatasourceimpl.SettingsDataSource
@@ -29,6 +31,9 @@ abstract class LocalDataSourceDependencies {
 
     @Binds
     abstract fun provideLocalTrackingDataSourceImpl(impl: LocalTrackingDataSourceImpl): LocalTrackingDataSource
+
+    @Binds
+    abstract fun provideLocalDebugLogDataSourceImpl(impl: LocalDebugLogDataSourceImpl): LocalDebugLogDataSource
 
     companion object {
         @Provides
@@ -59,6 +64,10 @@ abstract class LocalDataSourceDependencies {
         @Provides
         @Singleton
         fun provideTripDao(database: AppDatabase) = database.tripDao()
+
+        @Provides
+        @Singleton
+        fun provideDebugLogDao(database: AppDatabase) = database.debugLogDao()
 
         private const val SETTINGS_PREFERENCES = "settings"
     }

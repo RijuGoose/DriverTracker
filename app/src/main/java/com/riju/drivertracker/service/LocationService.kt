@@ -8,6 +8,7 @@ import android.location.Location
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.riju.drivertracker.extensions.roundToDecimalPlaces
+import com.riju.repository.DebugLogRepository
 import com.riju.repository.LocationRepository
 import com.riju.repository.PermissionRepository
 import com.riju.repository.TrackingRepository
@@ -41,6 +42,9 @@ class LocationService : Service() {
     @Inject
     lateinit var permissionRepository: PermissionRepository
 
+    @Inject
+    lateinit var debugLogRepository: DebugLogRepository
+
     override fun onBind(intent: Intent?): IBinder? {
         return null
     }
@@ -69,6 +73,7 @@ class LocationService : Service() {
             .onStart {
                 notificationManager.notify(1, notification.build())
                 trackingRepository.startTracking()
+                debugLogRepository.addLog("tracking started")
             }
             .map { locationState ->
                 when (locationState) {
@@ -77,6 +82,9 @@ class LocationService : Service() {
                     }
 
                     is UserPermissionState.Denied -> {
+                        debugLogRepository.addLog(
+                            "denied received in LocationService (location stop, give last location)"
+                        )
                         stop()
                         lastLocation
                     }

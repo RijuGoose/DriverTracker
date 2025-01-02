@@ -19,6 +19,7 @@ import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationToken
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.android.gms.tasks.OnTokenCanceledListener
+import com.riju.localdatasourceimpl.LocalDebugLogDataSource
 import com.riju.repository.LocationRepository
 import com.riju.repository.model.UserPermissionState
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -34,7 +35,8 @@ import kotlin.coroutines.suspendCoroutine
 class LocationRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context,
     private val client: FusedLocationProviderClient,
-    private val geocoder: Geocoder
+    private val geocoder: Geocoder,
+    private val localDebugLogDataSource: LocalDebugLogDataSource
 ) : LocationRepository {
 
     override fun getLocationUpdates(interval: Long): Flow<UserPermissionState<Location>> {
@@ -44,6 +46,7 @@ class LocationRepositoryImpl @Inject constructor(
                 ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) !=
                 PackageManager.PERMISSION_GRANTED
             ) {
+                localDebugLogDataSource.addLog("Location permission is not granted (send denied permission state)")
                 send(UserPermissionState.Denied)
                 close()
             }
@@ -52,6 +55,7 @@ class LocationRepositoryImpl @Inject constructor(
             val isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
             val isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
             if (!isGpsEnabled && !isNetworkEnabled) {
+                localDebugLogDataSource.addLog("Location is not enabled (send denied permission state)")
                 send(UserPermissionState.Denied)
                 close()
             }
@@ -72,6 +76,7 @@ class LocationRepositoryImpl @Inject constructor(
                     super.onLocationAvailability(locationAvailability)
                     if (!locationAvailability.isLocationAvailable) {
                         launch {
+                            localDebugLogDataSource.addLog("Location is not available (send denied permission state)")
                             send(UserPermissionState.Denied)
                             close()
                         }

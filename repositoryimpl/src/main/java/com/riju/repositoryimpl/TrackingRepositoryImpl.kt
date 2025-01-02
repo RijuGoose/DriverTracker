@@ -3,6 +3,7 @@ package com.riju.repositoryimpl
 import com.riju.localdatasourceimpl.LocalTrackingDataSource
 import com.riju.localdatasourceimpl.model.RoutePointEntity
 import com.riju.localdatasourceimpl.model.TripEntity
+import com.riju.repository.DebugLogRepository
 import com.riju.repository.SettingsRepository
 import com.riju.repository.TrackingRepository
 import com.riju.repository.model.TrackingPoint
@@ -20,7 +21,8 @@ import javax.inject.Inject
 
 class TrackingRepositoryImpl @Inject constructor(
     private val localTrackingDataSource: LocalTrackingDataSource,
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
+    private val debugLogRepository: DebugLogRepository
 ) : TrackingRepository {
     private val currentTripId: MutableStateFlow<String?> = MutableStateFlow(null)
     private var currentTripCounter: Int = 0
@@ -50,6 +52,7 @@ class TrackingRepositoryImpl @Inject constructor(
                 localTrackingDataSource.getTripPoints(trip.tripId).lastOrNull()?.let { lastPoint ->
                     currentTripId.value = trip.tripId
                     currentTripCounter = lastPoint.pointCount + 1
+                    debugLogRepository.addLog("trip resumed (TrackingRepository)")
                 }
             } else {
                 initTrip()
@@ -64,6 +67,7 @@ class TrackingRepositoryImpl @Inject constructor(
                 startTime = ZonedDateTime.now()
             )
         )
+        debugLogRepository.addLog("trip started (TrackingRepository)")
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -94,12 +98,15 @@ class TrackingRepositoryImpl @Inject constructor(
     }
 
     override suspend fun stopTracking() {
-        currentTripCounter = 0
-        localTrackingDataSource.modifyEndTime(
-            tripId = requireNotNull(currentTripId.value),
-            endTime = ZonedDateTime.now().toString()
-        )
-        currentTripId.value = null
+        currentTripId.value?.let { tripId ->
+            currentTripCounter = 0
+            localTrackingDataSource.modifyEndTime(
+                tripId = tripId,
+                endTime = ZonedDateTime.now().toString()
+            )
+            currentTripId.value = null
+            debugLogRepository.addLog("trip stopped (TrackingRepository)")
+        }
     }
 
     override fun isTracking(): Boolean {
