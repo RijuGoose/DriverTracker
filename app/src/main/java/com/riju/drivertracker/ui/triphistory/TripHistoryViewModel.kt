@@ -14,6 +14,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import java.time.ZonedDateTime
 import javax.inject.Inject
 
@@ -22,7 +23,7 @@ class TripHistoryViewModel @Inject constructor(
     private val tripHistoryRepository: TripHistoryRepository,
     private val debugLogRepository: DebugLogRepository,
     @ApplicationContext private val context: Context,
-) : BaseViewModel<List<TripHistoryItemUIModel>>() {
+) : BaseViewModel<Map<LocalDate, List<TripHistoryItemUIModel>>>() {
     private val orderBy = DatabaseConstants.Field.StartTime
     private val _isOrderAscending = MutableStateFlow(false)
     val isOrderAscending = _isOrderAscending.asStateFlow()
@@ -44,7 +45,7 @@ class TripHistoryViewModel @Inject constructor(
                             startLocation = it.startLocation,
                             endLocation = it.endLocation
                         )
-                    }
+                    }.groupBy { it.startTime.toLocalDate() }
                 _screenStatus.value = ScreenStatus.Success(tripHistory)
                 hidePullToRefresh()
             } catch (e: Exception) {
@@ -67,7 +68,7 @@ class TripHistoryViewModel @Inject constructor(
                         startLocation = message[0],
                         endLocation = message[1]
                     )
-                }
+                }.groupBy { it.startTime.toLocalDate() }
                 _screenStatus.value = ScreenStatus.Success(logHistory)
                 hidePullToRefresh()
             } catch (e: Exception) {

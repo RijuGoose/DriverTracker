@@ -1,8 +1,11 @@
 package com.riju.drivertracker.ui.triphistory
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -10,6 +13,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.LogoDev
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -25,10 +29,11 @@ import com.riju.drivertracker.ui.uicomponents.DTTopAppBar
 import com.riju.drivertracker.ui.uicomponents.DTTopBarActionButton
 import com.riju.drivertracker.ui.uicomponents.DTTopBarActionButton.ActionIcon
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TripHistoryScreen(
     viewModel: TripHistoryViewModel,
-    onTripSelected: (String) -> Unit
+    onTripSelected: (String) -> Unit,
 ) {
     val isOrderAscending by viewModel.isOrderAscending.collectAsState()
     DTScaffold(
@@ -77,11 +82,19 @@ fun TripHistoryScreen(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                items(tripHistoryList) { trip ->
-                    TripHistoryItem(
-                        onTripSelected = onTripSelected,
-                        trip = trip
-                    )
+                tripHistoryList.forEach { (date, tripList) ->
+                    stickyHeader {
+                        Text(
+                            modifier = Modifier.fillMaxWidth().background(color = MaterialTheme.colorScheme.background),
+                            text = date.toString()
+                        )
+                    }
+                    items(tripList) { trip ->
+                        TripHistoryItem(
+                            onTripSelected = onTripSelected,
+                            trip = trip
+                        )
+                    }
                 }
             }
         }
