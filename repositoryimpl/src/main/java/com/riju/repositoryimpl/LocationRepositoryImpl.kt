@@ -76,9 +76,7 @@ class LocationRepositoryImpl @Inject constructor(
                     super.onLocationAvailability(locationAvailability)
                     if (!locationAvailability.isLocationAvailable) {
                         launch {
-                            localDebugLogDataSource.addLog("Location is not available (send denied permission state)")
-                            send(UserPermissionState.Denied)
-                            close()
+                            localDebugLogDataSource.addLog("Location is not available (nothing happens)")
                         }
                     }
                 }
