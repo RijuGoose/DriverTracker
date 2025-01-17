@@ -3,7 +3,6 @@ package com.riju.repositoryimpl
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
-import android.location.Address
 import android.location.Geocoder
 import android.location.Location
 import android.location.LocationManager
@@ -125,7 +124,7 @@ class LocationRepositoryImpl @Inject constructor(
         )
     }
 
-    override suspend fun getLocationAddress(lat: Double, lon: Double): Address? {
+    override suspend fun getLocationAddress(lat: Double, lon: Double): String? {
         return if (Geocoder.isPresent()) {
             suspendCoroutine { continuation ->
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -134,7 +133,8 @@ class LocationRepositoryImpl @Inject constructor(
                         lon,
                         1
                     ) { addresses ->
-                        continuation.resume(addresses.firstOrNull())
+                        val address = addresses.firstOrNull()
+                        continuation.resume(address?.locality + ", " + address?.thoroughfare)
                     }
                 } else {
                     val addresses = geocoder.getFromLocation(
@@ -142,7 +142,8 @@ class LocationRepositoryImpl @Inject constructor(
                         lon,
                         1
                     )
-                    continuation.resume(addresses?.firstOrNull())
+                    val address = addresses?.firstOrNull()
+                    continuation.resume(address?.locality + ", " + address?.thoroughfare)
                 }
             }
         } else {

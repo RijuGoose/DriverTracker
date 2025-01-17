@@ -109,6 +109,13 @@ class TrackingRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun setEndpoints(startLocation: String, endLocation: String) {
+        currentTripId.value?.let { tripId ->
+            localTrackingDataSource.modifyStartLocation(tripId, startLocation)
+            localTrackingDataSource.modifyEndLocation(tripId, endLocation)
+        }
+    }
+
     override fun isTracking(): Boolean {
         return currentTripId.value != null
     }

@@ -12,6 +12,7 @@ import com.riju.repository.DebugLogRepository
 import com.riju.repository.LocationRepository
 import com.riju.repository.PermissionRepository
 import com.riju.repository.TrackingRepository
+import com.riju.repository.TripHistoryRepository
 import com.riju.repository.model.TrackingPoint
 import com.riju.repository.model.UserPermissionState
 import dagger.hilt.android.AndroidEntryPoint
@@ -21,6 +22,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -38,6 +40,9 @@ class LocationService : Service() {
 
     @Inject
     lateinit var trackingRepository: TrackingRepository
+
+    @Inject
+    lateinit var tripHistoryRepository: TripHistoryRepository
 
     @Inject
     lateinit var permissionRepository: PermissionRepository
@@ -111,7 +116,19 @@ class LocationService : Service() {
     }
 
     private suspend fun stop() {
+        trackingRepository.getCurrentTripFlow().firstOrNull()?.let { tripPoints ->
+            if (tripPoints.isNotEmpty()) {
+                val addresses =
+                    listOf(tripPoints.first(), tripPoints.last())
+                        .map {
+                            locationRepository.getLocationAddress(it.lat, it.lon) ?: "-"
+                        }
+                trackingRepository.setEndpoints(addresses[0], addresses[1])
+            }
+        }
+
         trackingRepository.stopTracking()
+        debugLogRepository.addLog("endpoints set in LocationService")
         stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
     }

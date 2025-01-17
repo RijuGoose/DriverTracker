@@ -8,6 +8,7 @@ interface TrackingRepository {
     suspend fun startTracking()
     fun addRoutePoint(trackingPoint: TrackingPoint)
     suspend fun stopTracking()
+    suspend fun setEndpoints(startLocation: String, endLocation: String)
     fun isTracking(): Boolean
     fun getCurrentTripFlow(): Flow<List<TrackingPoint>?>
 }

@@ -142,7 +142,7 @@ class TripDetailsViewModel @Inject constructor(
                 if (address != null) {
                     tripHistoryRepository.modifyEndLocation(
                         tripId = tripId,
-                        endLocation = address.locality + ", " + address.thoroughfare
+                        endLocation = address
                     )
                 }
                 loadTripDetails()
@@ -163,7 +163,7 @@ class TripDetailsViewModel @Inject constructor(
                 if (address != null) {
                     tripHistoryRepository.modifyStartLocation(
                         tripId = tripId,
-                        startLocation = address.locality + ", " + address.thoroughfare
+                        startLocation = address
                     )
                 }
                 loadTripDetails()
