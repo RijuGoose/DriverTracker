@@ -19,7 +19,6 @@ import java.time.ZonedDateTime
 @Composable
 fun TripDetailData(
     modifier: Modifier = Modifier,
-    avgSpeed: Double,
     maxSpeed: Double,
     distance: Double,
     startTime: ZonedDateTime,
@@ -41,8 +40,8 @@ fun TripDetailData(
         ) {
             TripDetailCard(
                 modifier = Modifier.weight(1f),
-                cardTitle = stringResource(R.string.trip_details_avg_speed),
-                cardValue = avgSpeed.toString()
+                cardTitle = stringResource(R.string.trip_details_distance),
+                cardValue = stringResource(R.string.trip_details_distance_in_km, distance)
             )
             TripDetailCard(
                 modifier = Modifier.weight(1f),
@@ -50,11 +49,6 @@ fun TripDetailData(
                 cardValue = maxSpeed.toString()
             )
         }
-        TripDetailCard(
-            modifier = Modifier.fillMaxWidth(),
-            cardTitle = stringResource(R.string.trip_details_distance),
-            cardValue = stringResource(R.string.trip_details_distance_in_km, distance)
-        )
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)

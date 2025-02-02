@@ -181,8 +181,8 @@ private fun CurrentTripScreenBody(
                         onClick = onStartClick,
                         shape = CircleShape,
                         colors = ButtonDefaults.buttonColors().copy(
-                            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                            contentColor = MaterialTheme.colorScheme.onTertiaryContainer
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                     ) {
                         Icon(

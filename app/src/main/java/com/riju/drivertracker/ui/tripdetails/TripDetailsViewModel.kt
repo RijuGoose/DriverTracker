@@ -64,9 +64,6 @@ class TripDetailsViewModel @Inject constructor(
                     tripDetails?.let { tripDetails ->
                         _screenStatus.value = ScreenStatus.Success(
                             TripDetailsUiModel(
-                                avgSpeed = tripData.map {
-                                    it.speed
-                                }.average().roundToDecimalPlaces(2),
                                 maxSpeed = maxSpeed,
                                 distance = tripDistance.roundToDecimalPlaces(2),
                                 startTime = tripDetails.startTime,

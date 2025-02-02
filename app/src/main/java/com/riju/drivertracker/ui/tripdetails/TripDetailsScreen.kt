@@ -50,7 +50,6 @@ fun TripDetailsScreen(
         viewModel = viewModel,
         sheetContent = { uiModel ->
             TripDetailData(
-                avgSpeed = uiModel.avgSpeed,
                 maxSpeed = uiModel.maxSpeed,
                 distance = uiModel.distance,
                 startTime = uiModel.startTime,
