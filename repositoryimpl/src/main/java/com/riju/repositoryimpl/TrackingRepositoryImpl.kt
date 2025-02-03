@@ -3,71 +3,44 @@ package com.riju.repositoryimpl
 import com.riju.localdatasourceimpl.LocalTrackingDataSource
 import com.riju.localdatasourceimpl.model.RoutePointEntity
 import com.riju.localdatasourceimpl.model.TripEntity
-import com.riju.repository.DebugLogRepository
-import com.riju.repository.SettingsRepository
 import com.riju.repository.TrackingRepository
 import com.riju.repository.model.TrackingPoint
+import com.riju.repository.model.TripDetails
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
-import java.time.Duration
 import java.time.ZonedDateTime
 import java.util.UUID
 import javax.inject.Inject
 
 class TrackingRepositoryImpl @Inject constructor(
-    private val localTrackingDataSource: LocalTrackingDataSource,
-    private val settingsRepository: SettingsRepository,
-    private val debugLogRepository: DebugLogRepository
+    private val localTrackingDataSource: LocalTrackingDataSource
 ) : TrackingRepository {
     private val currentTripId: MutableStateFlow<String?> = MutableStateFlow(null)
     private var currentTripCounter: Int = 0
 
     override val isTracking = currentTripId.map { it != null }
 
-    override suspend fun startTracking() {
-        currentTripId.value = UUID.randomUUID().toString()
+    override suspend fun startTrip() {
         currentTripCounter = 0
+        currentTripId.value = UUID.randomUUID().toString()
 
-        val lastTrip = localTrackingDataSource.getLastTripDetails()
-        val shouldMergeTrips = settingsRepository.settings.first().shouldMergeTrips
-
-        if (shouldMergeTrips) {
-            resumeOrInitTrip(lastTrip)
-        } else {
-            initTrip()
-        }
-    }
-
-    private suspend fun resumeOrInitTrip(lastTrip: TripEntity?) {
-        lastTrip?.let { trip ->
-            val duration = Duration.between(trip.endTime, ZonedDateTime.now())
-            val tripMergeDuration = settingsRepository.settings.first().mergeTripSeconds.toLong()
-
-            if (duration < Duration.ofSeconds(tripMergeDuration)) {
-                localTrackingDataSource.getTripPoints(trip.tripId).lastOrNull()?.let { lastPoint ->
-                    currentTripId.value = trip.tripId
-                    currentTripCounter = lastPoint.pointCount + 1
-                    debugLogRepository.addLog("trip resumed (TrackingRepository)")
-                }
-            } else {
-                initTrip()
-            }
-        } ?: initTrip()
-    }
-
-    private fun initTrip() {
         localTrackingDataSource.addTrip(
             trip = TripEntity(
                 tripId = requireNotNull(currentTripId.value),
                 startTime = ZonedDateTime.now()
             )
         )
-        debugLogRepository.addLog("trip started (TrackingRepository)")
+    }
+
+    override suspend fun resumeTrip(trip: TripDetails) {
+        localTrackingDataSource.getTripPoints(trip.tripId).lastOrNull()?.let { lastPoint ->
+            currentTripId.value = trip.tripId
+            currentTripCounter = lastPoint.pointCount + 1
+        }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -97,7 +70,7 @@ class TrackingRepositoryImpl @Inject constructor(
         )
     }
 
-    override suspend fun stopTracking() {
+    override suspend fun stopTrip() {
         currentTripId.value?.let { tripId ->
             currentTripCounter = 0
             localTrackingDataSource.modifyEndTime(
@@ -105,7 +78,6 @@ class TrackingRepositoryImpl @Inject constructor(
                 endTime = ZonedDateTime.now().toString()
             )
             currentTripId.value = null
-            debugLogRepository.addLog("trip stopped (TrackingRepository)")
         }
     }
 

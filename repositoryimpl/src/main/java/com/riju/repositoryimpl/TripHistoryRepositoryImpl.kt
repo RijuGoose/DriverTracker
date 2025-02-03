@@ -46,10 +46,7 @@ class TripHistoryRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getLastTripDetails(): TripDetails? {
-        return localTrackingDataSource.getAllTripHistory(
-            orderBy = DatabaseConstants.Field.EndTime.fieldName,
-            isAscending = false
-        ).map { tripEntity ->
+        return localTrackingDataSource.getLastTripDetails()?.let { tripEntity ->
             TripDetails(
                 tripId = tripEntity.tripId,
                 startTime = tripEntity.startTime,
@@ -57,7 +54,7 @@ class TripHistoryRepositoryImpl @Inject constructor(
                 startLocation = tripEntity.startLocation,
                 endLocation = tripEntity.endLocation,
             )
-        }.firstOrNull()
+        }
     }
 
     @Suppress("MagicNumber")

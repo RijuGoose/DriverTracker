@@ -11,6 +11,7 @@ import com.riju.drivertracker.extensions.roundToDecimalPlaces
 import com.riju.repository.DebugLogRepository
 import com.riju.repository.LocationRepository
 import com.riju.repository.PermissionRepository
+import com.riju.repository.SettingsRepository
 import com.riju.repository.TrackingRepository
 import com.riju.repository.TripHistoryRepository
 import com.riju.repository.model.TrackingPoint
@@ -22,12 +23,15 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
+import java.time.Duration
+import java.time.ZonedDateTime
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -49,6 +53,9 @@ class LocationService : Service() {
 
     @Inject
     lateinit var debugLogRepository: DebugLogRepository
+
+    @Inject
+    lateinit var settingsRepository: SettingsRepository
 
     override fun onBind(intent: Intent?): IBinder? {
         return null
@@ -77,7 +84,19 @@ class LocationService : Service() {
         locationRepository.getLocationUpdates(LOCATION_UPDATE_DELAY)
             .onStart {
                 notificationManager.notify(1, notification.build())
-                trackingRepository.startTracking()
+
+                tripHistoryRepository.getLastTripDetails()?.let { nonNullLastTrip ->
+                    val duration = Duration.between(nonNullLastTrip.endTime, ZonedDateTime.now())
+                    val settings = settingsRepository.settings.first()
+                    val tripMergeDuration = settings.mergeTripSeconds.toLong()
+
+                    if (settings.shouldMergeTrips && duration < Duration.ofSeconds(tripMergeDuration)) {
+                        trackingRepository.resumeTrip(nonNullLastTrip)
+                    } else {
+                        trackingRepository.startTrip()
+                    }
+                } ?: trackingRepository.startTrip()
+
                 debugLogRepository.addLog("tracking started")
             }
             .map { locationState ->
@@ -127,7 +146,7 @@ class LocationService : Service() {
             }
         }
 
-        trackingRepository.stopTracking()
+        trackingRepository.stopTrip()
         debugLogRepository.addLog("endpoints set in LocationService")
         stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
