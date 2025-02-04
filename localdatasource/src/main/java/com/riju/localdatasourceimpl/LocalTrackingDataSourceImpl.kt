@@ -28,8 +28,8 @@ class LocalTrackingDataSourceImpl @Inject constructor(
         tripDao.updateTripEndTime(tripId, endTime)
     }
 
-    override suspend fun getAllTripHistory(orderBy: String, isAscending: Boolean): List<TripEntity> {
-        return tripDao.getAllTripHistory(orderBy, isAscending)
+    override suspend fun getAllTripHistoryFlow(orderBy: String, isAscending: Boolean): Flow<List<TripEntity>> {
+        return tripDao.getAllTripHistoryFlow(orderBy, isAscending)
     }
 
     override suspend fun getLastTripDetails(): TripEntity? {

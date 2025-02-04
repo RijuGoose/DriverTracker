@@ -6,21 +6,53 @@ import com.riju.repository.TripHistoryRepository
 import com.riju.repository.model.TrackingPoint
 import com.riju.repository.model.TripDetails
 import com.riju.repositoryimpl.extensions.distanceBetweenInMeters
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import java.time.LocalDate
 import javax.inject.Inject
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class TripHistoryRepositoryImpl @Inject constructor(
     private val localTrackingDataSource: LocalTrackingDataSource,
 ) : TripHistoryRepository {
-    override suspend fun getAllTripHistory(orderBy: DatabaseConstants.Field, isAscending: Boolean): List<TripDetails> {
-        return localTrackingDataSource.getAllTripHistory(orderBy.fieldName, isAscending).map { tripEntity ->
-            TripDetails(
-                tripId = tripEntity.tripId,
-                startTime = tripEntity.startTime,
-                endTime = tripEntity.endTime,
-                startLocation = tripEntity.startLocation,
-                endLocation = tripEntity.endLocation,
-            )
+    private val _tripHistoryList = MutableStateFlow<Map<LocalDate, List<TripDetails>>>(emptyMap())
+    override val tripHistoryList = _tripHistoryList.asStateFlow()
+
+    private val collectScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val orderBy = DatabaseConstants.Field.StartTime
+
+    private val _isListAscending = MutableStateFlow(false)
+    override val isListAscending = _isListAscending.asStateFlow()
+
+    init {
+        collectScope.launch {
+            _isListAscending.flatMapLatest { isAscending ->
+                localTrackingDataSource.getAllTripHistoryFlow(orderBy.fieldName, isAscending)
+            }.collect { tripEntities ->
+                _tripHistoryList.update {
+                    tripEntities.map { tripEntity ->
+                        TripDetails(
+                            tripId = tripEntity.tripId,
+                            startTime = tripEntity.startTime,
+                            endTime = tripEntity.endTime,
+                            startLocation = tripEntity.startLocation,
+                            endLocation = tripEntity.endLocation,
+                        )
+                    }.groupBy { it.startTime.toLocalDate() }
+                }
+            }
         }
+    }
+
+    override fun toggleSortOrder() {
+        _isListAscending.value = !_isListAscending.value
     }
 
     override suspend fun getTripHistoryRouteById(tripId: String): List<TrackingPoint> {

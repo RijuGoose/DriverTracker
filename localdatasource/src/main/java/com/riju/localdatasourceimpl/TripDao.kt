@@ -30,13 +30,13 @@ interface TripDao {
     @Query("SELECT * FROM trips WHERE tripId = :tripId")
     suspend fun getTripRoute(tripId: String): TripRoutePoints
 
-    @RawQuery
-    suspend fun getAllTripHistoryRaw(query: SupportSQLiteQuery): List<TripEntity>
+    @RawQuery(observedEntities = [TripEntity::class])
+    fun getAllTripHistoryFlowRaw(query: SupportSQLiteQuery): Flow<List<TripEntity>>
 
-    suspend fun getAllTripHistory(orderBy: String, isAscending: Boolean): List<TripEntity> {
+    fun getAllTripHistoryFlow(orderBy: String, isAscending: Boolean): Flow<List<TripEntity>> {
         val sortOrder = if (isAscending) "ASC" else "DESC"
         val query = SimpleSQLiteQuery("SELECT * FROM trips ORDER BY $orderBy $sortOrder")
-        return getAllTripHistoryRaw(query)
+        return getAllTripHistoryFlowRaw(query)
     }
 
     @Query("SELECT * FROM trips WHERE tripId = :tripId")

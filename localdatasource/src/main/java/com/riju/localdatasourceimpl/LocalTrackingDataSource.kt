@@ -11,7 +11,7 @@ interface LocalTrackingDataSource {
     suspend fun modifyEndTime(tripId: String, endTime: String)
     suspend fun modifyStartLocation(tripId: String, startLocation: String)
     suspend fun modifyEndLocation(tripId: String, endLocation: String)
-    suspend fun getAllTripHistory(orderBy: String, isAscending: Boolean): List<TripEntity>
+    suspend fun getAllTripHistoryFlow(orderBy: String, isAscending: Boolean): Flow<List<TripEntity>>
     suspend fun getLastTripDetails(): TripEntity?
     suspend fun getTripPoints(tripId: String): List<RoutePointEntity>
     suspend fun getTripDetails(tripId: String): TripEntity?
