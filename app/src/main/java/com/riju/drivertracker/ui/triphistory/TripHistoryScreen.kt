@@ -13,7 +13,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Sort
-import androidx.compose.material.icons.filled.LogoDev
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -52,15 +51,6 @@ fun TripHistoryScreen(
         topBar = DTTopAppBar(
             title = stringResource(R.string.trip_history_top_bar_title),
             actionButtons = listOf(
-                DTTopBarActionButton(
-                    icon = ActionIcon(
-                        icon = Icons.Default.LogoDev,
-                    ),
-                    onClick = {
-                        // viewModel.getLogHistory()
-                    },
-                    contentDescription = "Logs"
-                ),
                 DTTopBarActionButton(
                     icon = ActionIcon(
                         icon = Icons.AutoMirrored.Filled.Sort,
