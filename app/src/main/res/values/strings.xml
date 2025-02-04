@@ -10,7 +10,7 @@
     <string name="app_shortcut_disabled_message">Placeholder disabled message</string>
 
     <string name="trip_history_top_bar_title">Trip history</string>
-    <string name="trip_history_no_trips_found">No trips found</string>
+    <string name="trip_history_no_trips_found">No trips here yet</string>
     <string name="trip_history_start_time">Start time:</string>
 
     <string name="login_field_email">Email</string>

@@ -4,8 +4,10 @@ import com.riju.localdatasourceimpl.model.RoutePointEntity
 import com.riju.localdatasourceimpl.model.TripEntity
 import kotlinx.coroutines.flow.Flow
 
+@Suppress("TooManyFunctions")
 interface LocalTrackingDataSource {
     fun addTrip(trip: TripEntity)
+    suspend fun deleteTrip(tripId: String)
     fun addRoutePoint(routePoint: RoutePointEntity)
     fun getTripPointsFlow(tripId: String): Flow<List<RoutePointEntity>?>
     suspend fun modifyEndTime(tripId: String, endTime: String)

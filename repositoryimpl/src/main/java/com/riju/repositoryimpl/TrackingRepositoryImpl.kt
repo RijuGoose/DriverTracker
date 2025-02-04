@@ -9,6 +9,7 @@ import com.riju.repository.model.TripDetails
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -19,18 +20,19 @@ import javax.inject.Inject
 class TrackingRepositoryImpl @Inject constructor(
     private val localTrackingDataSource: LocalTrackingDataSource
 ) : TrackingRepository {
-    private val currentTripId: MutableStateFlow<String?> = MutableStateFlow(null)
+    private val _currentTripId: MutableStateFlow<String?> = MutableStateFlow(null)
+    override val currentTripId: Flow<String?> = _currentTripId.asStateFlow()
     private var currentTripCounter: Int = 0
 
-    override val isTracking = currentTripId.map { it != null }
+    override val isTracking = _currentTripId.map { it != null }
 
     override suspend fun startTrip() {
         currentTripCounter = 0
-        currentTripId.value = UUID.randomUUID().toString()
+        _currentTripId.value = UUID.randomUUID().toString()
 
         localTrackingDataSource.addTrip(
             trip = TripEntity(
-                tripId = requireNotNull(currentTripId.value),
+                tripId = requireNotNull(_currentTripId.value),
                 startTime = ZonedDateTime.now()
             )
         )
@@ -38,14 +40,17 @@ class TrackingRepositoryImpl @Inject constructor(
 
     override suspend fun resumeTrip(trip: TripDetails) {
         localTrackingDataSource.getTripPoints(trip.tripId).lastOrNull()?.let { lastPoint ->
-            currentTripId.value = trip.tripId
+            _currentTripId.value = trip.tripId
             currentTripCounter = lastPoint.pointCount + 1
+        } ?: run {
+            _currentTripId.value = trip.tripId
+            currentTripCounter = 0
         }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun getCurrentTripFlow(): Flow<List<TrackingPoint>?> {
-        return currentTripId.filterNotNull().flatMapLatest { tripId ->
+        return _currentTripId.filterNotNull().flatMapLatest { tripId ->
             localTrackingDataSource.getTripPointsFlow(tripId).map { routePoints ->
                 routePoints?.map { routePoint ->
                     TrackingPoint(
@@ -61,7 +66,7 @@ class TrackingRepositoryImpl @Inject constructor(
     override fun addRoutePoint(trackingPoint: TrackingPoint) {
         localTrackingDataSource.addRoutePoint(
             routePoint = RoutePointEntity(
-                tripId = requireNotNull(currentTripId.value),
+                tripId = requireNotNull(_currentTripId.value),
                 pointCount = currentTripCounter++,
                 latitude = trackingPoint.lat,
                 longitude = trackingPoint.lon,
@@ -71,24 +76,24 @@ class TrackingRepositoryImpl @Inject constructor(
     }
 
     override suspend fun stopTrip() {
-        currentTripId.value?.let { tripId ->
+        _currentTripId.value?.let { tripId ->
             currentTripCounter = 0
             localTrackingDataSource.modifyEndTime(
                 tripId = tripId,
                 endTime = ZonedDateTime.now().toString()
             )
-            currentTripId.value = null
+            _currentTripId.value = null
         }
     }
 
     override suspend fun setEndpoints(startLocation: String, endLocation: String) {
-        currentTripId.value?.let { tripId ->
+        _currentTripId.value?.let { tripId ->
             localTrackingDataSource.modifyStartLocation(tripId, startLocation)
             localTrackingDataSource.modifyEndLocation(tripId, endLocation)
         }
     }
 
     override fun isTracking(): Boolean {
-        return currentTripId.value != null
+        return _currentTripId.value != null
     }
 }

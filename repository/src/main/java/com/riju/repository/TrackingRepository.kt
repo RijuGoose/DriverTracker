@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface TrackingRepository {
     val isTracking: Flow<Boolean>
+    val currentTripId: Flow<String?>
     suspend fun startTrip()
     fun addRoutePoint(trackingPoint: TrackingPoint)
     suspend fun stopTrip()

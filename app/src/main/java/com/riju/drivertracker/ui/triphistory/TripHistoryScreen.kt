@@ -101,19 +101,63 @@ fun TripHistoryScreen(
                         Text(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(start = 16.dp)
-                                .background(color = MaterialTheme.colorScheme.background),
+                                .background(color = MaterialTheme.colorScheme.background)
+                                .padding(start = 16.dp),
                             style = MaterialTheme.typography.titleLarge,
                             text = date.toString()
                         )
                     }
-                    items(tripList) { trip ->
+                    items(
+                        items = tripList,
+                        key = { it.tripId }
+                    ) { trip ->
                         TripHistoryItem(
-                            onTripSelected = onTripSelected,
-                            trip = trip
+                            onTripSelected = { tripId ->
+                                coroutineScope.launch {
+                                    if (viewModel.isTripEmpty(tripId)) {
+                                        viewModel.setEmptyTripDialog(tripId)
+                                    } else {
+                                        onTripSelected.invoke(tripId)
+                                    }
+                                }
+                            },
+                            trip = trip,
+                            modifier = Modifier.animateItem()
                         )
                     }
                 }
             }
         }
     }
+
+    emptyTripDialog?.let { dialogTripId ->
+        EmptyTripDialog(
+            tripId = dialogTripId,
+            onConfirmDelete = { tripId ->
+                viewModel.deleteTrip(tripId)
+                viewModel.setEmptyTripDialog(null)
+            },
+            onDismissDialog = {
+                viewModel.setEmptyTripDialog(null)
+            }
+        )
+    }
+}
+
+@Composable
+fun EmptyTripDialog(
+    tripId: String,
+    onConfirmDelete: (String) -> Unit,
+    onDismissDialog: () -> Unit,
+) {
+    DTConfirmDialog(
+        title = "This trip has no route",
+        text = "This trip has no route. Do you want to delete it?",
+        confirmButtonText = "Delete",
+        dismissButtonText = "Cancel",
+        onConfirmButton = {
+            onConfirmDelete(tripId)
+        },
+        onDismiss = onDismissDialog
+    )
+}

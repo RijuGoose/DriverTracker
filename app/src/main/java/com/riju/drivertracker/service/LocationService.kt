@@ -85,17 +85,21 @@ class LocationService : Service() {
             .onStart {
                 notificationManager.notify(1, notification.build())
 
-                tripHistoryRepository.getLastTripDetails()?.let { nonNullLastTrip ->
-                    val duration = Duration.between(nonNullLastTrip.endTime, ZonedDateTime.now())
+                val lastTrip = tripHistoryRepository.getLastTripDetails()
+                if (lastTrip == null) {
+                    trackingRepository.startTrip()
+                } else {
+                    val duration = Duration.between(lastTrip.endTime, ZonedDateTime.now())
                     val settings = settingsRepository.settings.first()
-                    val tripMergeDuration = settings.mergeTripSeconds.toLong()
 
-                    if (settings.shouldMergeTrips && duration < Duration.ofSeconds(tripMergeDuration)) {
-                        trackingRepository.resumeTrip(nonNullLastTrip)
+                    if (settings.shouldMergeTrips &&
+                        duration < Duration.ofSeconds(settings.mergeTripSeconds.toLong())
+                    ) {
+                        trackingRepository.resumeTrip(lastTrip)
                     } else {
                         trackingRepository.startTrip()
                     }
-                } ?: trackingRepository.startTrip()
+                }
 
                 debugLogRepository.addLog("tracking started")
             }

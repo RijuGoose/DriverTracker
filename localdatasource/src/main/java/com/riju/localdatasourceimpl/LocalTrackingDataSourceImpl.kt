@@ -5,6 +5,7 @@ import com.riju.localdatasourceimpl.model.TripEntity
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
+@Suppress("TooManyFunctions")
 class LocalTrackingDataSourceImpl @Inject constructor(
     private val tripDao: TripDao
 ) : LocalTrackingDataSource {
@@ -34,6 +35,10 @@ class LocalTrackingDataSourceImpl @Inject constructor(
 
     override suspend fun getLastTripDetails(): TripEntity? {
         return tripDao.getLastTripDetails()
+    }
+
+    override suspend fun deleteTrip(tripId: String) {
+        tripDao.deleteTrip(tripId)
     }
 
     override suspend fun modifyStartLocation(tripId: String, startLocation: String) {

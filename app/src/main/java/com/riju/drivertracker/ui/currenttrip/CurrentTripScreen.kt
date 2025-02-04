@@ -39,7 +39,6 @@ import com.riju.drivertracker.R
 import com.riju.drivertracker.extensions.openSettings
 import com.riju.drivertracker.extensions.shouldShowDialog
 import com.riju.drivertracker.ui.uicomponents.DTScaffold
-import com.riju.drivertracker.ui.uicomponents.DTTopAppBar
 import com.riju.drivertracker.ui.uicomponents.PermissionAlertDialog
 import kotlinx.coroutines.launch
 
@@ -86,10 +85,7 @@ fun CurrentTripScreen(
 
     DTScaffold(
         viewModel = viewModel,
-        horizontalPadding = 0.dp,
-        topBar = DTTopAppBar(
-            title = stringResource(R.string.current_trip_top_bar_title)
-        )
+        horizontalPadding = 0.dp
     ) {
         CurrentTripScreenBody(
             onStartClick = {

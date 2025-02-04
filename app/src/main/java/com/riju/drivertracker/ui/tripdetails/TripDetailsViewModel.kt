@@ -46,7 +46,7 @@ class TripDetailsViewModel @Inject constructor(
             _screenStatus.value = ScreenStatus.LoadingFullScreen
             try {
                 val tripDetails = tripHistoryRepository.getTripDetails(tripId)
-                val tripRoute = tripHistoryRepository.getTripHistoryRouteById(tripId)
+                val tripRoute = tripHistoryRepository.getTripRouteById(tripId)
                 val tripDistance = tripHistoryRepository.getDistanceTravelled(tripId)
                 tripRoute?.let { tripData ->
                     val maxSpeed = tripData.maxOf { it.speed }

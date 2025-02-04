@@ -55,7 +55,7 @@ class TripHistoryRepositoryImpl @Inject constructor(
         _isListAscending.value = !_isListAscending.value
     }
 
-    override suspend fun getTripHistoryRouteById(tripId: String): List<TrackingPoint> {
+    override suspend fun getTripRouteById(tripId: String): List<TrackingPoint> {
         return localTrackingDataSource.getTripPoints(tripId).map { routePointEntity ->
             TrackingPoint(
                 lat = routePointEntity.latitude,
@@ -91,13 +91,17 @@ class TripHistoryRepositoryImpl @Inject constructor(
 
     @Suppress("MagicNumber")
     override suspend fun getDistanceTravelled(tripId: String): Double {
-        return getTripHistoryRouteById(tripId).zipWithNext { point1, point2 ->
+        return getTripRouteById(tripId).zipWithNext { point1, point2 ->
             point1.distanceBetweenInMeters(point2)
         }.sum() / 1000
     }
 
     override suspend fun modifyStartLocation(tripId: String, startLocation: String) {
         localTrackingDataSource.modifyStartLocation(tripId, startLocation)
+    }
+
+    override suspend fun deleteTrip(tripId: String) {
+        localTrackingDataSource.deleteTrip(tripId)
     }
 
     override suspend fun modifyEndLocation(tripId: String, endLocation: String) {
